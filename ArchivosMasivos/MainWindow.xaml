@@ -1,0 +1,86 @@
+﻿<Window x:Class="CorreosMasivos.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Archivos Masivos" Height="514.019" Width="976.596" Loaded="Window_Loaded" IsHitTestVisible="True" OpacityMask="#FFD84646" VerticalContentAlignment="Center" WindowStartupLocation="CenterScreen" 
+        ResizeMode="NoResize" BorderBrush="White" Foreground="Black" Icon="Icono.ico" AllowDrop="True" Grid.IsSharedSizeScope="True" IsTabStop="True" UseLayoutRounding="False" Visibility="Visible" Closed="Window_Closed">
+    <Window.Background>
+        <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+            <GradientStop Color="#FFCFDFF0"/>
+            <GradientStop Color="#FF726B6B" Offset="1"/>
+        </LinearGradientBrush>
+    </Window.Background>
+    <Grid AllowDrop="True" IsHitTestVisible="True" Margin="0,0,4,1">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="900*"/>
+            <ColumnDefinition Width="67*"/>
+        </Grid.ColumnDefinitions>
+        <Label x:Name="Lbl_Enviar" Content="Nombre del archivo" Margin="20,97,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Height="26" HorizontalAlignment="Left" Width="155">
+            <Label.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="-0.275"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Label.RenderTransform>
+        </Label>
+        <Button x:Name="Btn_Enviar" Content="Enviar" ToolTip="Enviar correo de manera masiva" Margin="556,438,0,0" VerticalAlignment="Top" Height="20" Click="Btn_Enviar_Click" HorizontalAlignment="Left" Width="75"/>
+        <ComboBox x:Name="cmbColumnaID" ToolTip="Se requiere para identificar cada archivo generado &#10; y no correr el riesgo de sobre-escribirlo." Margin="0,101,17,0" VerticalAlignment="Top" Height="22" BorderBrush="White" AllowDrop="True" HorizontalAlignment="Right" Width="117" Grid.ColumnSpan="2">
+            <ComboBox.Background>
+                <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+                    <GradientStop Color="White" Offset="1"/>
+                    <GradientStop Color="White" Offset="1"/>
+                </LinearGradientBrush>
+            </ComboBox.Background>
+        </ComboBox>
+        <ListView x:Name="TablaCorreo" Height="247" Margin="19,141,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="921" Grid.ColumnSpan="2">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <Label Content="Seleccione archivo Excel" Margin="19,40,0,0" VerticalAlignment="Top" Height="26" HorizontalAlignment="Left" Width="161"/>
+        <Label Content="Seleccione plantilla de Word" Margin="19,69,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="161" Height="26"/>
+        <TextBox x:Name="txtExcel" Height="23" Margin="185,42,0,0" TextWrapping="Wrap" VerticalAlignment="Top" AllowDrop="True" AcceptsTab="True" AcceptsReturn="True" HorizontalAlignment="Left" Width="699"/>
+        <TextBox x:Name="txtWord" Height="23" Margin="185,71,0,0" TextWrapping="Wrap" VerticalAlignment="Top" AllowDrop="True" AcceptsTab="True" AcceptsReturn="True" IsReadOnly="True" HorizontalAlignment="Left" Width="699"/>
+        <Button x:Name="btnExcel" Content="..." ToolTip="Seleccionar el archivo excel donde se encuentra la &#10; información con la que se completará la plantilla &#10; del comunicado." Margin="6,41,0,0" VerticalAlignment="Top" Height="23" Click="btnExcel_Click" HorizontalAlignment="Left" Width="44" Grid.Column="1"/>
+        <Button x:Name="btnWord" Content="..." ToolTip="Seleccionar la plantilla del &#10; comunicado en formato word." Margin="6,73,0,0" VerticalAlignment="Top" Height="23" Click="btnWord_Click" HorizontalAlignment="Left" Width="44" Grid.Column="1"/>
+        <Button x:Name="Btn_GenerarArchivos" ToolTip="Generar los archivos en masivo. &#10; Si la opción 'Generar archivo y enviar correo' está &#10; seleccionada, envía el archivo como adjunto al correo &#10; indicado." Content="Generar" Margin="343,438,0,0" VerticalAlignment="Top" Height="20" Click="Btn_GenerarArchivos_Click" HorizontalAlignment="Left" Width="75"/>
+        <TextBox x:Name="txtNombreArchivo" ToolTip="Es requerido para nombrar los archivos que se van a generear" Height="23" Margin="185,100,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left" Width="590"/>
+        <Label x:Name="Lbl_ColmunaID" Content="ID" HorizontalAlignment="Left" Margin="784,100,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.39,0.227" Width="22" Height="26">
+            <Label.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="-0.275"/>
+                    <TranslateTransform X="-0.035" Y="0.102"/>
+                </TransformGroup>
+            </Label.RenderTransform>
+        </Label>
+        <Label x:Name="MarcaJAFH" Content="@JaFh" Margin="20,454,0,0" FontSize="8" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Width="38" RenderTransformOrigin="2.816,0.604" Grid.Column="1"/>
+        <RadioButton x:Name="RbtnGenerar" ToolTip="Generar archivo a partir de una plantilla" Content="Generar Archivo" Margin="243,406,0,0" VerticalAlignment="Top" Checked="RbtnGenerar_Checked" Foreground="#FFFBF5F5" HorizontalAlignment="Left" Width="104" Height="15"/>
+        <RadioButton x:Name="RbtnGenerarEnviar" ToolTip="Generar archivo y enviar correo" Content="Generar archivo y enviar correo" Margin="403,406,0,0" VerticalAlignment="Top" Checked="RbtnGenerarEnviar_Checked" Foreground="#FFF7F1F1" HorizontalAlignment="Left" Width="185" Height="15"/>
+        <!--<Popup Name="MyPopup" Placement="Mouse" IsOpen = "{Binding ElementName = RbtnGenerarEnviar ,Path = IsChecked}"
+               AllowsTransparency = "True" PopupAnimation = "Slide"
+               HorizontalOffset="10" VerticalOffset="-160">
+            <StackPanel Background="blue" Height="87" Width="171">
+                <Label HorizontalAlignment="Center" Content="Seleccione el"/>
+                <Label HorizontalAlignment="Center" Content="correo electronico" Height="25" Margin="32,0,33,0"/>
+                <ComboBox x:Name="cmbIDEmail" Height="23" Margin="25,5,10,10" HorizontalAlignment="Left" Width="123"/>
+            </StackPanel>
+        </Popup>-->
+        <RadioButton x:Name="RbtnEnviar" Content="Enviar correos" ToolTip="Solo envia correo" Margin="664,406,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.209,-2.333" Checked="RbtnEnviar_Checked" Foreground="#FFF9F3F3" HorizontalAlignment="Left" Width="93" Height="15"/>
+        <StackPanel x:Name="stpanelCarga" Background="LightGray" Visibility="Hidden" Margin="71,170,56,114" Grid.ColumnSpan="2"  >
+            <ProgressBar x:Name="pgbcarga" Height="24" Margin="30,60,30,0" VerticalAlignment="Top" IsIndeterminate="True"
+        		Visibility="Hidden" Value="100" />
+            <TextBlock x:Name="txtcarga" Margin="30,-90,30,0" Text="La carga del archivo seleccionado puede tardar varios minutos, &#xA; por favor espere." VerticalAlignment="Center" Visibility="Hidden" TextAlignment="Center" Height="38"  />
+        </StackPanel>
+        <StackPanel x:Name="stpanelMensaje" Background="LightGray" Visibility="Hidden" Margin="71,170,56,114" Grid.ColumnSpan="2"  >
+            <ProgressBar x:Name="pgbMensaje" Height="24" Margin="30,60,30,0" VerticalAlignment="Top" IsIndeterminate="True"
+        		Visibility="Hidden" Value="100" />
+            <TextBlock x:Name="txtMensaje" Margin="30,-90,30,0" Text="Proceso en ejecución, &#xA; por favor espere." VerticalAlignment="Center" Visibility="Hidden" TextAlignment="Center" Height="38"  />
+        </StackPanel>
+    </Grid>
+</Window>
