@@ -28,16 +28,17 @@ namespace ArchivoResCrucePasivocolCETILcedulas
             string linea = string.Empty;
             try
             {
-                string[] Archivos = { @"D:\jfandino\Documentos\05. CETIL\RES_CRUCE_PASIVOCOL_CEDULAS_HOJA1_20210531100840\RES_CRUCE_PASIVOCOL_CEDULAS_HOJA1_20210531100840.CSV", @"D:\jfandino\Documentos\05. CETIL\RES_CRUCE_PASIVOCOL_CEDULAS_HOJA2_20210531112255\RES_CRUCE_PASIVOCOL_CEDULAS_HOJA2_20210531112255.CSV"};
-                string ArchivoR2 = @"D:\jfandino\Documentos\05. CETIL\RES_CRUCE_PASIVOCOL_CEDULAS_HOJA2_20210531112255\RES_CRUCE_PASIVOCOL_CEDULAS_HOJA_R2.txt";
-                string ArchivoR3 = @"D:\jfandino\Documentos\05. CETIL\RES_CRUCE_PASIVOCOL_CEDULAS_HOJA2_20210531112255\RES_CRUCE_PASIVOCOL_CEDULAS_HOJA_R3.txt";
-                string ArchivoR4 = @"D:\jfandino\Documentos\05. CETIL\RES_CRUCE_PASIVOCOL_CEDULAS_HOJA2_20210531112255\RES_CRUCE_PASIVOCOL_CEDULAS_HOJA_R4.txt";
-                string ArchivoR5 = @"D:\jfandino\Documentos\05. CETIL\RES_CRUCE_PASIVOCOL_CEDULAS_HOJA2_20210531112255\RES_CRUCE_PASIVOCOL_CEDULAS_HOJA_R5.txt";
-                string ArchivoR6 = @"D:\jfandino\Documentos\05. CETIL\RES_CRUCE_PASIVOCOL_CEDULAS_HOJA2_20210531112255\RES_CRUCE_PASIVOCOL_CEDULAS_HOJA_R6.txt";
-                string ArchivoErrores = @"D:\jfandino\Documentos\05. CETIL\RES_CRUCE_PASIVOCOL_CEDULAS_HOJA2_20210531112255\Errores";
+                string[] Archivos = { @"D:\jfandino\Documentos\05. CETIL\Cruce2022\RES_PASIVOCOLREGISTROSPERSONA_2022_20220209111948.CSV" };
+                string ArchivoR2 = @"D:\jfandino\Documentos\05. CETIL\Cruce2022\RegistrosPersona2022\RES_PASIVOCOLREGISTROSPERSONA_2022_R2.txt";
+                string ArchivoR3 = @"D:\jfandino\Documentos\05. CETIL\Cruce2022\RegistrosPersona2022\RES_PASIVOCOLREGISTROSPERSONA_2022_R3.txt";
+                string ArchivoR4 = @"D:\jfandino\Documentos\05. CETIL\Cruce2022\RegistrosPersona2022\RES_PASIVOCOLREGISTROSPERSONA_2022_R4.txt";
+                string ArchivoR5 = @"D:\jfandino\Documentos\05. CETIL\Cruce2022\RegistrosPersona2022\RES_PASIVOCOLREGISTROSPERSONA_2022_R5.txt";
+                string ArchivoR6 = @"D:\jfandino\Documentos\05. CETIL\Cruce2022\RegistrosPersona2022\RES_PASIVOCOLREGISTROSPERSONA_2022_R6.txt";
+                string ArchivoErrores = @"D:\jfandino\Documentos\05. CETIL\Cruce2022\RegistrosPersona2022\Errores";
 
                 List<string> LsRegistros = new List<string>();
                 int NumArchivo = 0;
+                int NumeroLinea = 0;
 
                 foreach (string archivo in Archivos.ToList())
                 {
@@ -52,6 +53,7 @@ namespace ArchivoResCrucePasivocolCETILcedulas
                     {
                         while (sr.Peek() >= 0)
                         {
+                            Console.WriteLine(string.Format("Linea numero {0}", NumeroLinea+=1));
                             linea = sr.ReadLine();
                             linea = linea.Replace("_;_", "¬");
                             linea = linea.Replace(";", "/");
@@ -84,11 +86,28 @@ namespace ArchivoResCrucePasivocolCETILcedulas
                                                 {
                                                     if (!string.IsNullOrEmpty(Arreglo[3]))
                                                     {
-                                                        Arreglo[3] = DateTime.ParseExact(Arreglo[3], "yyyyMMdd", null).ToString("yyyy/MM/dd");
+                                                        DateTime fecha = StringToDatetime(Arreglo[3]);
+                                                        if(fecha != new DateTime())
+                                                        {
+                                                            Arreglo[3] = fecha.ToString("yyyy-MM-dd");
+                                                        }
+                                                        else
+                                                        {
+                                                            throw new Exception(string.Format("La cadena {0} no tiene un formato fecha valido", Arreglo[3]));
+                                                        }
+                                                        
                                                     }
                                                     if (!string.IsNullOrEmpty(Arreglo[4]))
                                                     {
-                                                        Arreglo[4] = DateTime.ParseExact(Arreglo[4], "yyyyMMdd", null).ToString("yyyy/MM/dd");
+                                                        DateTime fecha = StringToDatetime(Arreglo[4]);
+                                                        if (fecha != new DateTime())
+                                                        {
+                                                            Arreglo[4] = fecha.ToString("yyyy-MM-dd");
+                                                        }
+                                                        else
+                                                        {
+                                                            throw new Exception(string.Format("La cadena {0} no tiene un formato fecha valido", Arreglo[4]));
+                                                        }
                                                     }
                                                 }
                                                 catch (Exception ex)
@@ -110,11 +129,27 @@ namespace ArchivoResCrucePasivocolCETILcedulas
                                                 {
                                                     if (!string.IsNullOrEmpty(Arreglo[3]))
                                                     {
-                                                        Arreglo[3] = DateTime.ParseExact(Arreglo[3], "yyyyMMdd", null).ToString("yyyy/MM/dd");
+                                                        DateTime fecha = StringToDatetime(Arreglo[3]);
+                                                        if (fecha != new DateTime())
+                                                        {
+                                                            Arreglo[3] = fecha.ToString("yyyy-MM-dd");
+                                                        }
+                                                        else
+                                                        {
+                                                            throw new Exception(string.Format("La cadena {0} no tiene un formato fecha valido", Arreglo[3]));
+                                                        }
                                                     }
                                                     if (!string.IsNullOrEmpty(Arreglo[4]))
                                                     {
-                                                        Arreglo[4] = DateTime.ParseExact(Arreglo[4], "yyyyMMdd", null).ToString("yyyy/MM/dd");
+                                                        DateTime fecha = StringToDatetime(Arreglo[4]);
+                                                        if (fecha != new DateTime())
+                                                        {
+                                                            Arreglo[4] = fecha.ToString("yyyy-MM-dd");
+                                                        }
+                                                        else
+                                                        {
+                                                            throw new Exception(string.Format("La cadena {0} no tiene un formato fecha valido", Arreglo[4]));
+                                                        }
                                                     }
                                                 }
                                                 catch (Exception ex)
@@ -152,13 +187,42 @@ namespace ArchivoResCrucePasivocolCETILcedulas
                                                     ls.Add("ARCHIVO");
                                                     sw.WriteLine(string.Join(";", ls));
                                                 }
-                                                if (!string.IsNullOrEmpty(Arreglo[5]))
+                                                try
                                                 {
-                                                    Arreglo[5] = DateTime.ParseExact(Arreglo[5], "yyyyMMdd", null).ToString("yyyy/MM/dd");
+                                                    if (!string.IsNullOrEmpty(Arreglo[5]))
+                                                    {
+                                                        DateTime fecha = StringToDatetime(Arreglo[5]);
+                                                        if (fecha != new DateTime())
+                                                        {
+                                                            Arreglo[5] = fecha.ToString("yyyy-MM-dd");
+                                                        }
+                                                        else
+                                                        {
+                                                            throw new Exception(string.Format("La cadena {0} no tiene un formato fecha valido", Arreglo[5]));
+                                                        }
+                                                    }
+                                                    if (!string.IsNullOrEmpty(Arreglo[6]))
+                                                    {
+                                                        DateTime fecha = StringToDatetime(Arreglo[6]);
+                                                        if (fecha != new DateTime())
+                                                        {
+                                                            Arreglo[6] = fecha.ToString("yyyy-MM-dd");
+                                                        }
+                                                        else
+                                                        {
+                                                            throw new Exception(string.Format("La cadena {0} no tiene un formato fecha valido", Arreglo[6]));
+                                                        }
+                                                    }
                                                 }
-                                                if (!string.IsNullOrEmpty(Arreglo[6]))
+                                                catch (Exception ex)
                                                 {
-                                                    Arreglo[6] = DateTime.ParseExact(Arreglo[6], "yyyyMMdd", null).ToString("yyyy/MM/dd");
+                                                    using (FileStream fs1 = new FileStream(ArchivoErrores + "R3.txt", FileMode.Append, FileAccess.Write))
+                                                    {
+                                                        using (StreamWriter sw1 = new StreamWriter(fs1, Encoding.UTF8))
+                                                        {
+                                                            sw1.WriteLine(string.Format("En la linea {0} se genera error: {1}", linea, ex.Message));
+                                                        }
+                                                    }
                                                 }
                                                 sw.WriteLine(string.Join(";", Arreglo));
                                                 encabezado3 = false;
@@ -169,11 +233,27 @@ namespace ArchivoResCrucePasivocolCETILcedulas
                                                 {
                                                     if (!string.IsNullOrEmpty(Arreglo[5]))
                                                     {
-                                                        Arreglo[5] = DateTime.ParseExact(Arreglo[5], "yyyyMMdd", null).ToString("yyyy/MM/dd");
+                                                        DateTime fecha = StringToDatetime(Arreglo[5]);
+                                                        if (fecha != new DateTime())
+                                                        {
+                                                            Arreglo[5] = fecha.ToString("yyyy-MM-dd");
+                                                        }
+                                                        else
+                                                        {
+                                                            throw new Exception(string.Format("La cadena {0} no tiene un formato fecha valido", Arreglo[5]));
+                                                        }
                                                     }
                                                     if (!string.IsNullOrEmpty(Arreglo[6]))
                                                     {
-                                                        Arreglo[6] = DateTime.ParseExact(Arreglo[6], "yyyyMMdd", null).ToString("yyyy/MM/dd");
+                                                        DateTime fecha = StringToDatetime(Arreglo[6]);
+                                                        if (fecha != new DateTime())
+                                                        {
+                                                            Arreglo[6] = fecha.ToString("yyyy-MM-dd");
+                                                        }
+                                                        else
+                                                        {
+                                                            throw new Exception(string.Format("La cadena {0} no tiene un formato fecha valido", Arreglo[6]));
+                                                        }
                                                     }
                                                 }
                                                 catch (Exception ex)
@@ -191,7 +271,7 @@ namespace ArchivoResCrucePasivocolCETILcedulas
                                         }
                                     }
                                     break;
-                                case "444":
+                                case "4":
                                     using (FileStream fs = new FileStream(ArchivoR4, FileMode.Append, FileAccess.Write))
                                     {
                                         using (StreamWriter sw = new StreamWriter(fs, Encoding.UTF8))
@@ -224,7 +304,15 @@ namespace ArchivoResCrucePasivocolCETILcedulas
                                                 {
                                                     if (!string.IsNullOrEmpty(Arreglo[14]))
                                                     {
-                                                        Arreglo[14] = DateTime.ParseExact(Arreglo[14], "yyyyMMdd", null).ToString("yyyy/MM/dd");
+                                                        DateTime fecha = StringToDatetime(Arreglo[14]);
+                                                        if (fecha != new DateTime())
+                                                        {
+                                                            Arreglo[14] = fecha.ToString("yyyy-MM-dd");
+                                                        }
+                                                        else
+                                                        {
+                                                            throw new Exception(string.Format("La cadena {0} no tiene un formato fecha valido", Arreglo[14]));
+                                                        }
                                                     }
                                                 }
                                                 catch (Exception ex)
@@ -247,7 +335,15 @@ namespace ArchivoResCrucePasivocolCETILcedulas
                                                 {
                                                     if (!string.IsNullOrEmpty(Arreglo[14]))
                                                     {
-                                                        Arreglo[14] = DateTime.ParseExact(Arreglo[14], "yyyyMMdd", null).ToString("yyyy/MM/dd");
+                                                        DateTime fecha = StringToDatetime(Arreglo[14]);
+                                                        if (fecha != new DateTime())
+                                                        {
+                                                            Arreglo[14] = fecha.ToString("yyyy-MM-dd");
+                                                        }
+                                                        else
+                                                        {
+                                                            throw new Exception(string.Format("La cadena {0} no tiene un formato fecha valido", Arreglo[14]));
+                                                        }
                                                     }
                                                 }
                                                 catch (Exception ex)
@@ -265,7 +361,7 @@ namespace ArchivoResCrucePasivocolCETILcedulas
                                         }
                                     }
                                     break;
-                                case "555":
+                                case "5":
                                     using (FileStream fs = new FileStream(ArchivoR5, FileMode.Append, FileAccess.Write))
                                     {
                                         using (StreamWriter sw = new StreamWriter(fs, Encoding.UTF8))
@@ -285,16 +381,9 @@ namespace ArchivoResCrucePasivocolCETILcedulas
                                                     ls.Add("REALIZO APORTES");
                                                     ls.Add("NIT FONDO APORTES");
                                                     ls.Add("NOMBRE FONDO APORTES");
-                                                    ls.Add("HORAS LABORADAS");
-                                                    ls.Add("DIAS DE INTERRUPCION");
-                                                    ls.Add("FUENTE DE RECURSOS");
                                                     ls.Add("NIT ESTABLECIMIENTO");
                                                     ls.Add("NIVEL ESTABLECIMENTO");
                                                     ls.Add("MUNICIPIO");
-                                                    ls.Add("FACTORES DE APORTE");
-                                                    ls.Add("SESIONES ASISTIDAS");
-                                                    ls.Add("SESIONES NO ASISTIDAS CON EXCUSA");
-                                                    ls.Add("TOTAL DE SESIONES ASISTIDAS Y NO ASISTIDAS CON EXCUSA");
                                                     ls.Add("ARCHIVO");
                                                     sw.WriteLine(string.Join(";", ls));
                                                 }
@@ -302,11 +391,27 @@ namespace ArchivoResCrucePasivocolCETILcedulas
                                                 {
                                                     if (!string.IsNullOrEmpty(Arreglo[4]))
                                                     {
-                                                        Arreglo[4] = DateTime.ParseExact(Arreglo[4], "yyyyMMdd", null).ToString("yyyy/MM/dd");
+                                                        DateTime fecha = StringToDatetime(Arreglo[4]);
+                                                        if (fecha != new DateTime())
+                                                        {
+                                                            Arreglo[4] = fecha.ToString("yyyy-MM-dd");
+                                                        }
+                                                        else
+                                                        {
+                                                            throw new Exception(string.Format("La cadena {0} no tiene un formato fecha valido", Arreglo[4]));
+                                                        }
                                                     }
                                                     if (!string.IsNullOrEmpty(Arreglo[5]))
                                                     {
-                                                        Arreglo[5] = DateTime.ParseExact(Arreglo[5], "yyyyMMdd", null).ToString("yyyy/MM/dd");
+                                                        DateTime fecha = StringToDatetime(Arreglo[5]);
+                                                        if (fecha != new DateTime())
+                                                        {
+                                                            Arreglo[5] = fecha.ToString("yyyy-MM-dd");
+                                                        }
+                                                        else
+                                                        {
+                                                            throw new Exception(string.Format("La cadena {0} no tiene un formato fecha valido", Arreglo[5]));
+                                                        }
                                                     }
                                                 }
                                                 catch (Exception ex)
@@ -328,11 +433,27 @@ namespace ArchivoResCrucePasivocolCETILcedulas
                                                 {
                                                     if (!string.IsNullOrEmpty(Arreglo[4]))
                                                     {
-                                                        Arreglo[4] = DateTime.ParseExact(Arreglo[4], "yyyyMMdd", null).ToString("yyyy/MM/dd");
+                                                        DateTime fecha = StringToDatetime(Arreglo[4]);
+                                                        if (fecha != new DateTime())
+                                                        {
+                                                            Arreglo[4] = fecha.ToString("yyyy-MM-dd");
+                                                        }
+                                                        else
+                                                        {
+                                                            throw new Exception(string.Format("La cadena {0} no tiene un formato fecha valido", Arreglo[4]));
+                                                        }
                                                     }
                                                     if (!string.IsNullOrEmpty(Arreglo[5]))
                                                     {
-                                                        Arreglo[5] = DateTime.ParseExact(Arreglo[5], "yyyyMMdd", null).ToString("yyyy/MM/dd");
+                                                        DateTime fecha = StringToDatetime(Arreglo[5]);
+                                                        if (fecha != new DateTime())
+                                                        {
+                                                            Arreglo[5] = fecha.ToString("yyyy-MM-dd");
+                                                        }
+                                                        else
+                                                        {
+                                                            throw new Exception(string.Format("La cadena {0} no tiene un formato fecha valido", Arreglo[5]));
+                                                        }
                                                     }
                                                 }
                                                 catch (Exception ex)
@@ -350,7 +471,7 @@ namespace ArchivoResCrucePasivocolCETILcedulas
                                         }
                                     }
                                     break;
-                                case "666":
+                                case "6":
                                     using (FileStream fs = new FileStream(ArchivoR6, FileMode.Append, FileAccess.Write))
                                     {
                                         using (StreamWriter sw = new StreamWriter(fs, Encoding.UTF8))
@@ -379,11 +500,27 @@ namespace ArchivoResCrucePasivocolCETILcedulas
                                                 {
                                                     if (!string.IsNullOrEmpty(Arreglo[9]))
                                                     {
-                                                        Arreglo[9] = DateTime.ParseExact(Arreglo[9], "yyyyMMdd", null).ToString("yyyy/MM/dd");
+                                                        DateTime fecha = StringToDatetime(Arreglo[9]);
+                                                        if (fecha != new DateTime())
+                                                        {
+                                                            Arreglo[9] = fecha.ToString("yyyy-MM-dd");
+                                                        }
+                                                        else
+                                                        {
+                                                            throw new Exception(string.Format("La cadena {0} no tiene un formato fecha valido", Arreglo[9]));
+                                                        }
                                                     }
                                                     if (!string.IsNullOrEmpty(Arreglo[10]))
                                                     {
-                                                        Arreglo[10] = DateTime.ParseExact(Arreglo[10], "yyyyMMdd", null).ToString("yyyy/MM/dd");
+                                                        DateTime fecha = StringToDatetime(Arreglo[10]);
+                                                        if (fecha != new DateTime())
+                                                        {
+                                                            Arreglo[10] = fecha.ToString("yyyy-MM-dd");
+                                                        }
+                                                        else
+                                                        {
+                                                            throw new Exception(string.Format("La cadena {0} no tiene un formato fecha valido", Arreglo[10]));
+                                                        }
                                                     }
                                                 }
                                                 catch (Exception ex)
@@ -405,11 +542,27 @@ namespace ArchivoResCrucePasivocolCETILcedulas
                                                 {
                                                     if (!string.IsNullOrEmpty(Arreglo[9]))
                                                     {
-                                                        Arreglo[9] = DateTime.ParseExact(Arreglo[9], "yyyyMMdd", null).ToString("yyyy/MM/dd");
+                                                        DateTime fecha = StringToDatetime(Arreglo[9]);
+                                                        if (fecha != new DateTime())
+                                                        {
+                                                            Arreglo[9] = fecha.ToString("yyyy-MM-dd");
+                                                        }
+                                                        else
+                                                        {
+                                                            throw new Exception(string.Format("La cadena {0} no tiene un formato fecha valido", Arreglo[9]));
+                                                        }
                                                     }
                                                     if (!string.IsNullOrEmpty(Arreglo[10]))
                                                     {
-                                                        Arreglo[10] = DateTime.ParseExact(Arreglo[10], "yyyyMMdd", null).ToString("yyyy/MM/dd");
+                                                        DateTime fecha = StringToDatetime(Arreglo[10]);
+                                                        if (fecha != new DateTime())
+                                                        {
+                                                            Arreglo[10] = fecha.ToString("yyyy-MM-dd");
+                                                        }
+                                                        else
+                                                        {
+                                                            throw new Exception(string.Format("La cadena {0} no tiene un formato fecha valido", Arreglo[10]));
+                                                        }
                                                     }
                                                 }
                                                 catch (Exception ex)
@@ -432,12 +585,20 @@ namespace ArchivoResCrucePasivocolCETILcedulas
                     }
                 }
 
-                return "Proceso exitoso";
+                return "Proceso finalizado";
             }
             catch (Exception ex)
             {
                 throw new Exception(string.Format("En la linea {0} se genera error: {1}", linea, ex.Message));
             }
+        }
+
+        private static DateTime StringToDatetime(string strFecha)
+        {
+            string[] formatos = new[] { "yyyyMMdd", "yyyy-MM-dd", "yyyy/MM/dd" };
+            DateTime fechaValida;
+            DateTime.TryParseExact(strFecha, formatos, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out fechaValida);
+            return fechaValida;
         }
     }
 }
