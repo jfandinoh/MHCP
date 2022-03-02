@@ -155,6 +155,10 @@ namespace GenerarArchivosAsofondos
                     "WHERE tablename IN('tbl_f3_empleados_activos', 'tbl_f5_pensionados', 'tbl_f6_beneficiarios', 'tbl_f9_retirados') " +
                     "AND schemaname NOT IN('pc_datos_00', 'pc_datos_indice','public') " +
                     "ORDER BY 1";
+                    Query = "SELECT  DISTINCT(schemaname) AS schemaname FROM pg_tables " +
+                    "WHERE tablename IN('tbl_f3_empleados_activos', 'tbl_f5_pensionados', 'tbl_f6_beneficiarios', 'tbl_f9_retirados') " +
+                    "AND schemaname IN('pc_datos_99') " +
+                    "ORDER BY 1";
                     dataTable = postgreSql.ConsultarDatos(Query);
 
                     return dataTable;
@@ -222,13 +226,13 @@ namespace GenerarArchivosAsofondos
 
                 Query = "SELECT REPLACE(concat(tipo_registro,'_;_',regexp_replace(nombre_entidad,'\\r|\\n','','g'),'_;_',nit_entidad,'_;_',digito_verificacion,'_;_', "+
                 "tipo_documento,'_;_',numero_documento,'_;_',regexp_replace(nombre_persona, '\\r|\\n', '', 'g'),'_;_', genero,'_;_', " +
-                "estado_civil,'_;_',modalidad_pension,'_;_',concurrencia,'_;_',tipo_pensionado,'_;_', to_char(CAST(fecha_corte AS date), 'YYYYMMDD')),'\"','') "+
+                "estado_civil,'_;_',modalidad_pension,'_;_',concurrencia,'_;_',tipo_pensionado,'_;_', to_char(NOW(), 'YYYYMMDD')),'\"','') "+
                 "FROM temp_reg3; ";
                 EscribirArchivo("centrales_R3", Query, postgreSql, npgsqlTransaction);
 
                 Query = "SELECT REPLACE(concat(tipo_registro,'_;_',tipo_documento,'_;_',numero_documento,'_;_',nit_empresa,'_;_', "+
                 "regexp_replace(nombre_empresa, '\\r|\\n', '', 'g'), '_;_', fecha_inicial,'_;_', fecha_final,'_;_',ciuidad,'_;_',departamento,'_;_', " +
-                "tipo_pensionado, '_;_',to_char(CAST(fecha_corte AS date), 'YYYYMMDD')),'\"','') "+
+                "tipo_pensionado, '_;_',to_char(NOW(), 'YYYYMMDD')),'\"','') "+
                 "FROM temp_reg4; ";
                 EscribirArchivo("centrales_R4", Query, postgreSql, npgsqlTransaction);
 
@@ -254,7 +258,7 @@ namespace GenerarArchivosAsofondos
                         "tipo_documento,'_;_',numero_documento,'_;_',regexp_replace(nombre_persona, '\\r|\\n', '', 'g'),'_;_', genero,'_;_', " +
                         "tipo_documento_causante,'_;_',numero_documento_causante,'_;_',regexp_replace(nombre_causante, '\\r|\\n', '', 'g'),'_;_', " +
                         "genero_causante,'_;_',estado_civil_causante,'_;_',modalidad_pension,'_;_',tipo_pension,'_;_',concurrencia,'_;_', " +
-                        "to_char(CAST(fecha_corte AS date), 'YYYYMMDD')),'\"','') "+
+                        "to_char(NOW(), 'YYYYMMDD')),'\"','') "+
                 "FROM temp_reg5; ";
                 EscribirArchivo("centrales_R5", Query, postgreSql, npgsqlTransaction);
 
@@ -283,20 +287,20 @@ namespace GenerarArchivosAsofondos
                 Query = "SELECT REPLACE(concat(tipo_registro,'_;_',regexp_replace(nombre_entidad, '\\r|\\n', '', 'g'),'_;_',nit_entidad,'_;_',digito_verificacion,'_;_', "+
                 "tipo_documento,'_;_',numero_documento,'_;_',regexp_replace(nombre_persona, '\\r|\\n', '', 'g'),'_;_', genero,'_;_', " +
                 "estado_civil,'_;_',fecha_inicial,'_;_',fecha_final,'_;_',concurrencia,'_;_', " +
-                "to_char(CAST(fecha_corte AS date), 'YYYYMMDD')),'\"','') "+
+                "to_char(NOW(), 'YYYYMMDD')),'\"','') "+
                 "FROM temp_reg6; ";
                 EscribirArchivo("centrales_R6", Query, postgreSql, npgsqlTransaction);
 
                 Query = "SELECT REPLACE(concat(tipo_registro,'_;_',tipo_documento,'_;_',numero_documento,'_;_',nit_empresa,'_;_', "+
                 "regexp_replace(nombre_empresa, '\\r|\\n', '', 'g'), '_;_', fecha_inicial,'_;_', fecha_final,'_;_',ciuidad,'_;_',departamento,'_;_', "+
-                "to_char(CAST(fecha_corte AS date), 'YYYYMMDD')),'\"','') "+
+                "to_char(NOW(), 'YYYYMMDD')),'\"','') "+
                 "FROM temp_reg7; ";
                 EscribirArchivo("centrales_R7", Query, postgreSql, npgsqlTransaction);
 
                 Query = "SELECT REPLACE(concat(tipo_registro,'_;_',tipo_documento,'_;_',numero_documento,'_;_',regexp_replace(nombre_fondo_aportes,'\\r|\\n','','g'),'_;_', "+
-                "fecha_inicial,'_;_', fecha_final,'_;_',	to_char(CAST(fecha_corte AS date), 'YYYYMMDD')),'\"','') "+
+                "fecha_inicial,'_;_', fecha_final,'_;_',	to_char(NOW(), 'YYYYMMDD')),'\"','') "+
                 "FROM temp_reg8; ";
-                EscribirArchivo("centrales_R7", Query, postgreSql, npgsqlTransaction);
+                EscribirArchivo("centrales_R8", Query, postgreSql, npgsqlTransaction);
 
                 Console.WriteLine("Informacion retirados generada correctamente");
             }

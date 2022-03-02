@@ -136,14 +136,14 @@ namespace GenerarArchivosAsofondos
                     "SELECT* FROM dblink "+
                     "('demodbrnd', CONCAT('SELECT DISTINCT view_f5a.hp_co_dane, view_f5a.hp_nro_ord, view_f5a.hp_tip_doc, view_f5a.hp_nro_doc, view_f5a.hp_nit, " +
                        "view_f5a.hp_empresa, view_f5a.hp_fec_ing, view_f5a.hp_fec_ret, view_f5a.hp_ciudad, ci_nombre, dp_nombre " +
-                       "FROM pc_datos_ultenvio_',BD,'.pc_datos_', cod_depto ,E'.tbl_f5a_historia_laboral_pensionados AS view_f5a " +
+                       "FROM " + database + "." + Esquema + ".tbl_f5a_historia_laboral_pensionados AS view_f5a " +
                        "JOIN( " +
                            "SELECT ua_co_dane, ua_nro_ord, MAX(ua_nroinforme) AS informe " +
-                           "FROM pc_datos_ultenvio_',BD,'.pc_datos_', cod_depto ,E'.tbl_f1_unidades_administrativas " +
+                           "FROM " + database + "." + Esquema + ".tbl_f1_unidades_administrativas " +
                            "GROUP BY ua_co_dane, ua_nro_ord) AS lastReport " +
                        "ON lastReport.ua_co_dane = view_f5a.hp_co_dane AND lastReport.ua_nro_ord = view_f5a.hp_nro_ord AND lastReport.informe = view_f5a.hp_nroinforme " +
-                       "LEFT JOIN pc_datos_ultenvio_',BD,'.pc_datos_indice.view_cuidades ON view_f5a.hp_ciudad = view_cuidades.ci_co_dane " +
-                       "JOIN pc_datos_ultenvio_',BD,'.pc_datos_indice.view_departamentos ON view_cuidades.ci_co_dept = view_departamentos.dp_co_dept " +
+                       "LEFT JOIN " + database + ".pc_datos_indice.view_cuidades ON view_f5a.hp_ciudad = view_cuidades.ci_co_dane " +
+                       "JOIN " + database + ".pc_datos_indice.view_departamentos ON view_cuidades.ci_co_dept = view_departamentos.dp_co_dept " +
                        "WHERE view_f5a.hp_fec_ing IS NOT NULL AND view_f5a.hp_fec_ret IS NOT NULL " +
                        "ORDER BY view_f5a.hp_co_dane, view_f5a.hp_co_dane')) " +
                     "AS DATA( " +
@@ -193,14 +193,14 @@ namespace GenerarArchivosAsofondos
                     "('demodbrnd', CONCAT('SELECT DISTINCT view_f6a.hb_co_dane, view_f6a.hb_nro_ord, view_f6a.hb_tip_doc, view_f6a.hb_nro_doc, view_f6a.hb_nit, " +
                         "view_f6a.hb_empresa, view_f6a.hb_fec_ing, view_f6a.hb_fec_ret, view_f6a.hb_ciudad, " +
                         "ci_nombre, dp_nombre " +
-                        "FROM pc_datos_ultenvio_',BD,'.pc_datos_', cod_depto ,E'.tbl_f6a_historia_laboral_pensionados_fallecidos AS view_f6a " +
+                        "FROM " + database + "." + Esquema + ".tbl_f6a_historia_laboral_pensionados_fallecidos AS view_f6a " +
                         "JOIN( " +
                            "SELECT ua_co_dane, ua_nro_ord, MAX(ua_nroinforme) AS informe " +
-                           "FROM pc_datos_ultenvio_',BD,'.pc_datos_', cod_depto ,E'.tbl_f1_unidades_administrativas " +
+                           "FROM " + database + "." + Esquema + ".tbl_f1_unidades_administrativas " +
                            "GROUP BY ua_co_dane, ua_nro_ord) AS lastReport " +
                         "ON lastReport.ua_co_dane = view_f6a.hb_co_dane AND lastReport.ua_nro_ord = view_f6a.hb_nro_ord AND lastReport.informe = view_f6a.hb_nroinforme " +
-                        "LEFT JOIN pc_datos_ultenvio_',BD,'.pc_datos_indice.view_cuidades ON view_f6a.hb_ciudad = view_cuidades.ci_co_dane " +
-                        "JOIN pc_datos_ultenvio_',BD,'.pc_datos_indice.view_departamentos ON view_cuidades.ci_co_dept = view_departamentos.dp_co_dept " +
+                        "LEFT JOIN " + database + ".pc_datos_indice.view_cuidades ON view_f6a.hb_ciudad = view_cuidades.ci_co_dane " +
+                        "JOIN " + database + ".pc_datos_indice.view_departamentos ON view_cuidades.ci_co_dept = view_departamentos.dp_co_dept " +
                         "WHERE view_f6a.hb_fec_ing IS NOT NULL AND view_f6a.hb_fec_ret IS NOT NULL " +
                         "ORDER BY view_f6a.hb_co_dane, view_f6a.hb_co_dane')) " +
                    "AS DATA( " +
@@ -260,10 +260,10 @@ namespace GenerarArchivosAsofondos
                         case "ED":
                             Where1 = "WHERE (hv.tipoorganizacion NOT IN ('E.S.E.') OR hv.tipoorganizacion IS NULL) AND f5.pe_tip_doc NOT IN ('X') "+
                                     "AND f5.pe_sexo IS NOT NULL AND f5.pe_sexo <> '' AND f5.pe_est_civ IS NOT NULL AND f5.pe_est_civ <> '' "+
-                                    "AND LENGTH(f5.pe_nro_ord) = 2 AND f5.pe_nro_ord <> '01'; ";
+                                    "AND LENGTH(f5.pe_nro_ord) = 2 AND f5.pe_nro_ord <> '01' ";
                             Where2 = "WHERE(hv.tipoorganizacion NOT IN('E.S.E.') OR hv.tipoorganizacion IS NULL) AND f5.pf_tip_mue NOT IN('X') " +
                                     "AND f5.pf_sexo IS NOT NULL AND f5.pf_sexo <> '' AND f5.pf_est_civ IS NOT NULL AND f5.pf_est_civ <> '' " +
-                                    "AND LENGTH(f5.pf_nro_ord) = 2 AND f5.pf_nro_ord <>'01'";
+                                    "AND LENGTH(f5.pf_nro_ord) = 2 AND f5.pf_nro_ord <>'01' ";
                             break;
                         case "ESE":
                             Where1 = "WHERE hv.tipoorganizacion = 'E.S.E.' AND f5.pe_tip_doc NOT IN ('X') "+
@@ -275,7 +275,7 @@ namespace GenerarArchivosAsofondos
 
                     Query = "CREATE TEMP TABLE temp_reg3 AS "+
                     "SELECT* FROM( "+
-                        "--PV " +
+                        //"--PV " +
                         "SELECT 3 AS tipo_registro, " +
                         "TRIM(mig.nombre) AS nombre_entidad, " +
                         "CASE WHEN LENGTH(hv.nitua) > 9 THEN SUBSTRING(hv.nitua,1,9) ELSE hv.nitua END AS nit_entidad, " +
@@ -295,7 +295,7 @@ namespace GenerarArchivosAsofondos
                         "JOIN pruebas.entidades_migracion_inter mig ON f5.pe_co_dane = mig.\"codigoDane\" AND f5.pe_nro_ord = mig.\"unidadAdministrativa\" " +
                         Where1 +
                         "UNION " +
-                        "-- PF " +
+                        //"-- PF " +
                         "SELECT 3 AS tipo_registro, " +
                         "TRIM(mig.nombre) AS nombre_entidad, " +
                         "CASE WHEN LENGTH(hv.nitua) > 9 THEN SUBSTRING(hv.nitua,1,9) ELSE hv.nitua END AS nit_entidad, " +
@@ -356,9 +356,9 @@ namespace GenerarArchivosAsofondos
                             break;
                         case "ED":
                             Where1 = "WHERE(hv.tipoorganizacion NOT IN('E.S.E.') OR hv.tipoorganizacion IS NULL) AND f5a.hp_tip_doc NOT IN('X') " +
-                                    "AND LENGTH(f5a.hp_nro_ord) = 2 AND f5a.hp_nro_ord <>'01'";
+                                    "AND LENGTH(f5a.hp_nro_ord) = 2 AND f5a.hp_nro_ord <>'01' ";
                             Where2 = "WHERE(hv.tipoorganizacion NOT IN('E.S.E.') OR hv.tipoorganizacion IS NULL) AND f6a.hb_tip_doc NOT IN('X') " +
-                                    "AND LENGTH(f6a.hb_nro_ord) = 2 AND f6a.hb_nro_ord <>'01'";
+                                    "AND LENGTH(f6a.hb_nro_ord) = 2 AND f6a.hb_nro_ord <>'01' ";
                             break;
                         case "ESE":
                             Where1 = "WHERE hv.tipoorganizacion = 'E.S.E.' AND f5a.hp_tip_doc NOT IN ('X') "+

@@ -205,7 +205,7 @@ namespace GenerarArchivosAsofondos
                                     "AND f3.ha_nro_ord LIKE '01%'; ";
                             break;
                         case "ED":
-                            Where = "WHERE(hv.tipoorganizacion NOT IN('E.S.E.') OR hv.tipoorganizacion IS NULL) AND f3.ea_tip_doc NOT IN('X')  " +
+                            Where = "WHERE(hv.tipoorganizacion NOT IN('E.S.E.') OR hv.tipoorganizacion IS NULL) AND f3.ha_tip_doc NOT IN('X')  " +
                                     "AND LENGTH(f3.ha_nro_ord) = 2 AND f3.ha_nro_ord <>'01';";
                             break;
                         case "ESE":

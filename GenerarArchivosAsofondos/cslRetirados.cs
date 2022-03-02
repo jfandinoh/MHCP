@@ -291,7 +291,7 @@ namespace GenerarArchivosAsofondos
                       "TRIM(ci_nombre) AS ciuidad, " +
                       "TRIM(dp_nombre) AS departamento " +
                     "FROM temp_hl_retirados f9a " +
-                    "--JOIN temp_reg6 f9 ON f9.tipo_documento = f9a.hs_tip_doc AND f9.numero_documento = f9a.hs_nro_doc " +
+                    //"--JOIN temp_reg6 f9 ON f9.tipo_documento = f9a.hs_tip_doc AND f9.numero_documento = f9a.hs_nro_doc " +
                     "JOIN pruebas.tblhojavidaunidadesadministrativas hv ON f9a.hs_co_dane = hv.codet AND f9a.hs_nro_ord = hv.codua " +
                     "JOIN pruebas.entidades_migracion_inter mig ON f9a.hs_co_dane = mig.\"codigoDane\" AND f9a.hs_nro_ord = mig.\"unidadAdministrativa\" " +
                     Where;
@@ -329,11 +329,13 @@ namespace GenerarArchivosAsofondos
                     {
                         case "EC":
                             Where = "WHERE(hv.tipoorganizacion NOT IN('E.S.E.') OR hv.tipoorganizacion IS NULL) AND f8.pb_tip_doc NOT IN('X') " +
-                                    "AND f8.pb_fec_afiliacion<> f8.pb_fec_fin_afiliacion AND f8.pb_nro_ord LIKE '01%'; ";
+                                    //"AND f8.pb_fec_afiliacion<> f8.pb_fec_fin_afiliacion "+
+                                    "AND f8.pb_nro_ord LIKE '01%'; ";
                             break;
                         case "ED":
                             Where = "WHERE (hv.tipoorganizacion NOT IN ('E.S.E.') OR hv.tipoorganizacion IS NULL) AND f8.pb_tip_doc NOT IN ('X') "+
-                                    "AND f8.pb_fec_afiliacion<> f8.pb_fec_fin_afiliacion AND LENGTH(f8.pb_nro_ord) = 2 AND f8.pb_nro_ord <> '01'; ";
+                                    "AND f8.pb_fec_afiliacion<> f8.pb_fec_fin_afiliacion "+
+                                    "AND LENGTH(f8.pb_nro_ord) = 2 AND f8.pb_nro_ord <> '01'; ";
                             break;
                         case "ESE":
                             Where = "WHERE hv.tipoorganizacion = 'E.S.E.' AND f8.pb_tip_doc NOT IN ('X') "+
@@ -350,7 +352,7 @@ namespace GenerarArchivosAsofondos
                      "CASE WHEN f8.pb_fec_fin_afiliacion IS NOT NULL THEN to_char(cast(f8.pb_fec_fin_afiliacion as date),'YYYYMMDD') " +
                          "ELSE ''  END AS fecha_final " +
                     "FROM temp_hl_afp_retirados f8 " +
-                    "--JOIN temp_reg6 f9 ON f9.tipo_documento = f8.pb_tip_doc AND f9.numero_documento = f8.pb_nro_doc " +
+                    //"--JOIN temp_reg6 f9 ON f9.tipo_documento = f8.pb_tip_doc AND f9.numero_documento = f8.pb_nro_doc " +
                     "JOIN pruebas.tblhojavidaunidadesadministrativas hv ON f8.pb_co_dane = hv.codet AND f8.pb_nro_ord = hv.codua " +
                     "JOIN pruebas.entidades_migracion_inter mig ON f8.pb_co_dane = mig.\"codigoDane\" AND f8.pb_nro_ord = mig.\"unidadAdministrativa\" " +
                     "LEFT JOIN pruebas.fondos_aportes AS fondos ON fondos.id = f8.pb_afp " +

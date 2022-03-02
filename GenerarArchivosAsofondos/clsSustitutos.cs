@@ -171,7 +171,7 @@ namespace GenerarArchivosAsofondos
                     "CASE WHEN f6.pf_sector = 'SA' THEN 'S' " +
                          "WHEN f6.pf_sector = 'OS' THEN 'N' ELSE '' END AS concurrencia " +
                     "FROM temp_sustitutos f6 " +
-                    "--JOIN temp_pf pf ON f6.be_tip_mue = pf.tipo_documento AND f6.be_doc_mue = pf.numero_documento " +
+                    //"--JOIN temp_pf pf ON f6.be_tip_mue = pf.tipo_documento AND f6.be_doc_mue = pf.numero_documento " +
                     "JOIN pruebas.tblhojavidaunidadesadministrativas hv ON f6.be_co_dane = hv.codet AND f6.be_nro_ord = hv.codua " +
                     "JOIN pruebas.entidades_migracion_inter mig ON f6.be_co_dane = mig.\"codigoDane\" AND f6.be_nro_ord = mig.\"unidadAdministrativa\" " +
                     Where;
