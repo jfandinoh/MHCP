@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchivoCompararCompletaRegi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchivoCedulasExtranjeria", "ArchivoCedulasExtranjeria\ArchivoCedulasExtranjeria.csproj", "{79083235-51F6-4EB4-949B-9987A90802D2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenerarArchivosAsofondos", "GenerarArchivosAsofondos\GenerarArchivosAsofondos.csproj", "{DB39F626-58E0-457F-8260-BDF3F3D8D363}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{79083235-51F6-4EB4-949B-9987A90802D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79083235-51F6-4EB4-949B-9987A90802D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79083235-51F6-4EB4-949B-9987A90802D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB39F626-58E0-457F-8260-BDF3F3D8D363}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB39F626-58E0-457F-8260-BDF3F3D8D363}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB39F626-58E0-457F-8260-BDF3F3D8D363}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB39F626-58E0-457F-8260-BDF3F3D8D363}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
