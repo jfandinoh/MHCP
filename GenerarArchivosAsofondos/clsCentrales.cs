@@ -155,10 +155,7 @@ namespace GenerarArchivosAsofondos
                     "WHERE tablename IN('tbl_f3_empleados_activos', 'tbl_f5_pensionados', 'tbl_f6_beneficiarios', 'tbl_f9_retirados') " +
                     "AND schemaname NOT IN('pc_datos_00', 'pc_datos_indice','public') " +
                     "ORDER BY 1";
-                    Query = "SELECT  DISTINCT(schemaname) AS schemaname FROM pg_tables " +
-                    "WHERE tablename IN('tbl_f3_empleados_activos', 'tbl_f5_pensionados', 'tbl_f6_beneficiarios', 'tbl_f9_retirados') " +
-                    "AND schemaname IN('pc_datos_99') " +
-                    "ORDER BY 1";
+
                     dataTable = postgreSql.ConsultarDatos(Query);
 
                     return dataTable;
