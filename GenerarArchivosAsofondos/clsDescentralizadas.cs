@@ -191,13 +191,13 @@ namespace GenerarArchivosAsofondos
                 "tipo_documento,'_;_',numero_documento,'_;_',regexp_replace(nombre_persona, '\\r|\\n', '', 'g'),'_;_', genero,'_;_', " +
                 "estado_civil,'_;_',fecha_inicial,'_;_',concurrencia,'_;_',to_char(NOW(), 'YYYYMMDD')),'\"','') " +
                 "FROM temp_reg1; ";
-                EscribirArchivo("centrales_R1", Query, postgreSql, npgsqlTransaction);
+                EscribirArchivo("descentralizadas_R1", Query, postgreSql, npgsqlTransaction);
 
                 Query = "SELECT REPLACE(concat(tipo_registro,'_;_',regexp_replace(nombre_entidad, '\\r|\\n', '', 'g'),'_;_',nit_entidad,'_;_',digito_verificacion,'_;_', " +
                 "tipo_documento,'_;_',numero_documento,'_;_',regexp_replace(nombre_persona, '\\r|\\n', '', 'g'),'_;_', genero,'_;_', " +
                 "estado_civil,'_;_',fecha_inicial,'_;_',concurrencia,'_;_',to_char(NOW(), 'YYYYMMDD')),'\"','') " +
                 "FROM temp_reg1; ";
-                EscribirArchivo("centrales_R2", Query, postgreSql, npgsqlTransaction);
+                EscribirArchivo("descentralizadas_R2", Query, postgreSql, npgsqlTransaction);
 
                 Console.WriteLine("Informacion activos generada correctamente");
             }
@@ -225,13 +225,13 @@ namespace GenerarArchivosAsofondos
                 "tipo_documento,'_;_',numero_documento,'_;_',regexp_replace(nombre_persona, '\\r|\\n', '', 'g'),'_;_', genero,'_;_', " +
                 "estado_civil,'_;_',modalidad_pension,'_;_',concurrencia,'_;_',tipo_pensionado,'_;_', to_char(NOW(), 'YYYYMMDD')),'\"','') "+
                 "FROM temp_reg3; ";
-                EscribirArchivo("centrales_R3", Query, postgreSql, npgsqlTransaction);
+                EscribirArchivo("descentralizadas_R3", Query, postgreSql, npgsqlTransaction);
 
                 Query = "SELECT REPLACE(concat(tipo_registro,'_;_',tipo_documento,'_;_',numero_documento,'_;_',nit_empresa,'_;_', "+
                 "regexp_replace(nombre_empresa, '\\r|\\n', '', 'g'), '_;_', fecha_inicial,'_;_', fecha_final,'_;_',ciuidad,'_;_',departamento,'_;_', " +
                 "tipo_pensionado, '_;_',to_char(NOW(), 'YYYYMMDD')),'\"','') "+
                 "FROM temp_reg4; ";
-                EscribirArchivo("centrales_R4", Query, postgreSql, npgsqlTransaction);
+                EscribirArchivo("descentralizadas_R4", Query, postgreSql, npgsqlTransaction);
 
                 Console.WriteLine("Informacion pensionados generada correctamente");
             }
@@ -257,7 +257,7 @@ namespace GenerarArchivosAsofondos
                         "genero_causante,'_;_',estado_civil_causante,'_;_',modalidad_pension,'_;_',tipo_pension,'_;_',concurrencia,'_;_', " +
                         "to_char(NOW(), 'YYYYMMDD')),'\"','') "+
                 "FROM temp_reg5; ";
-                EscribirArchivo("centrales_R5", Query, postgreSql, npgsqlTransaction);
+                EscribirArchivo("descentralizadas_R5", Query, postgreSql, npgsqlTransaction);
 
                 Console.WriteLine("Informacion sustitutos generada correctamente");
             }
@@ -286,18 +286,18 @@ namespace GenerarArchivosAsofondos
                 "estado_civil,'_;_',fecha_inicial,'_;_',fecha_final,'_;_',concurrencia,'_;_', " +
                 "to_char(NOW(), 'YYYYMMDD')),'\"','') "+
                 "FROM temp_reg6; ";
-                EscribirArchivo("centrales_R6", Query, postgreSql, npgsqlTransaction);
+                EscribirArchivo("descentralizadas_R6", Query, postgreSql, npgsqlTransaction);
 
                 Query = "SELECT REPLACE(concat(tipo_registro,'_;_',tipo_documento,'_;_',numero_documento,'_;_',nit_empresa,'_;_', "+
                 "regexp_replace(nombre_empresa, '\\r|\\n', '', 'g'), '_;_', fecha_inicial,'_;_', fecha_final,'_;_',ciuidad,'_;_',departamento,'_;_', "+
                 "to_char(NOW(), 'YYYYMMDD')),'\"','') "+
                 "FROM temp_reg7; ";
-                EscribirArchivo("centrales_R7", Query, postgreSql, npgsqlTransaction);
+                EscribirArchivo("descentralizadas_R7", Query, postgreSql, npgsqlTransaction);
 
                 Query = "SELECT REPLACE(concat(tipo_registro,'_;_',tipo_documento,'_;_',numero_documento,'_;_',regexp_replace(nombre_fondo_aportes,'\\r|\\n','','g'),'_;_', "+
                 "fecha_inicial,'_;_', fecha_final,'_;_',	to_char(NOW(), 'YYYYMMDD')),'\"','') "+
                 "FROM temp_reg8; ";
-                EscribirArchivo("centrales_R7", Query, postgreSql, npgsqlTransaction);
+                EscribirArchivo("descentralizadas_R8", Query, postgreSql, npgsqlTransaction);
 
                 Console.WriteLine("Informacion retirados generada correctamente");
             }
