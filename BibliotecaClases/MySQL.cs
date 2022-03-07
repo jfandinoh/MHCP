@@ -20,7 +20,7 @@ namespace BibliotecaClases
             System.Console.WriteLine("Clase MySQL");
         }
 
-        public void AbrirConexion(String database)
+        public void AbrirConexion()
         {
             try
             {
