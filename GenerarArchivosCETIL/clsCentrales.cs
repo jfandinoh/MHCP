@@ -17,6 +17,7 @@ namespace GenerarArchivosCETIL
         {
             try
             {
+                String mensaje = string.Empty;
                 DataRow[] dataRowEntidadesGenerarInformacion = EntidadesGenerarInformacion.Select("cod_Ua = '01' AND fecha_GeneradoCETIL = ''");
 
                 if(dataRowEntidadesGenerarInformacion.Length > 0)
@@ -78,26 +79,30 @@ namespace GenerarArchivosCETIL
                                 clsConstruirInformacion.InformacionR7(pc_datos_ultenvio_ac, postgreSql);
                                 clsConstruirInformacion.InformacionR8(pc_datos_ultenvio_ac, postgreSql);
 
-
                                 String nombreArchivo = string.Format("{0}_{1}", DateTime.Now.ToString("yyyyMMddHHmmss"), clsConstruirInformacion.nit);
 
                                 string pathArchivo = System.IO.Path.Combine(path, nombreArchivo + ".csv");
-                                
-                                if(clsConstruirInformacion.EscribirArchivo(pathArchivo, postgreSql))
+
+                                if (clsConstruirInformacion.EscribirArchivo(pathArchivo, postgreSql))
                                 {
                                     clsInformacionEntidades.ActualizarFechaGeneracion(dataRowEntidadesGenerarInformacion[i][0].ToString(), dataRowEntidadesGenerarInformacion[i][1].ToString(), dataRowEntidadesGenerarInformacion[i][2].ToString(), pathArchivo);
-
                                     Console.WriteLine(string.Format("CodEt: {0}, CodUa: {1}, Archivo: {2}", dataRowEntidadesGenerarInformacion[i][1].ToString(), dataRowEntidadesGenerarInformacion[i][2].ToString(), pathArchivo));
                                 }
                                 AuxCantidadArchivos = AuxCantidadArchivos - 1;
                             }
                             else
                             {
-                                if (Directory.GetDirectories(path).Length != 0)
+                                if (Directory.GetFiles(path).Length != 0)
                                 {
                                     Comprimir comprimir = new Comprimir();
                                     comprimir.Carpeta(path);
+                                    mensaje = string.Format("Se generaron {0} archivos de entidades centrales", Directory.GetFiles(path).Length);
                                 }
+                                else
+                                {
+                                    mensaje = "No se generaron archivos";
+                                }
+                                break;
                                 break;
                             }
                         }
@@ -112,7 +117,7 @@ namespace GenerarArchivosCETIL
                     }
                 }
 
-                return string.Format("Se generaron {0} archivos de entidades centrales", CantidadArchivos);
+                return mensaje;
             }
             catch(Exception ex)
             {
