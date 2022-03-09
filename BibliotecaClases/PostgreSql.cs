@@ -113,7 +113,16 @@ namespace BibliotecaClases
                 npgsqlCommand.CommandType = CommandType.Text;
                 npgsqlCommand.CommandTimeout = 0;
 
-                return npgsqlCommand.ExecuteScalar().ToString();
+                var ExecuteScalar = npgsqlCommand.ExecuteScalar();
+
+                if(ExecuteScalar != null)
+                {
+                    return ExecuteScalar.ToString();
+                }
+                else
+                {
+                    return "";
+                }
             }
             catch (Exception ex)
             {
@@ -131,7 +140,16 @@ namespace BibliotecaClases
                 npgsqlCommand.Transaction = npgsqlTransaction;
                 npgsqlCommand.CommandTimeout = 0;
 
-                return npgsqlCommand.ExecuteScalar().ToString();
+                var ExecuteScalar = npgsqlCommand.ExecuteScalar();
+
+                if (ExecuteScalar != null)
+                {
+                    return ExecuteScalar.ToString();
+                }
+                else
+                {
+                    return "";
+                }
             }
             catch (Exception ex)
             {
