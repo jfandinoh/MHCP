@@ -1174,7 +1174,6 @@ namespace GenerarArchivosCETIL
 		{
 			try
 			{
-				Boolean Generado = false;
 				String queryPostgrSql = string.Empty;
 				DataTable dataTable = new DataTable();
 

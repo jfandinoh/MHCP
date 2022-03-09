@@ -48,10 +48,10 @@ namespace GenerarArchivosCETIL
                             Directory.CreateDirectory(path);
                         }
 
-                        for (int i = 0; i < dataRowEntidadesGenerarInformacion.Length; i++)
+                    for (int i = 0; i < dataRowEntidadesGenerarInformacion.Length; i++)
+                    {
+                        if (AuxCantidadArchivos != 0)
                         {
-                            if (AuxCantidadArchivos != 0)
-                            {
                                 clsCargarInformacion clsCargarInformacion = new clsCargarInformacion();
 
                                 clsCargarInformacion.InformacionSalarioBase(postgreSql);
@@ -89,17 +89,17 @@ namespace GenerarArchivosCETIL
 
                                     Console.WriteLine(string.Format("CodEt: {0}, CodUa: {1}, Archivo: {2}", dataRowEntidadesGenerarInformacion[i][1].ToString(), dataRowEntidadesGenerarInformacion[i][2].ToString(), pathArchivo));
                                 }
-                                AuxCantidadArchivos = AuxCantidadArchivos - 1;
-                            }
-                            else
-                            {
+                            AuxCantidadArchivos = AuxCantidadArchivos - 1;
+                        }
+                        else
+                        {
                                 if (Directory.GetDirectories(path).Length != 0)
                                 {
                                     Comprimir comprimir = new Comprimir();
                                     comprimir.Carpeta(path);
                                 }
-                                break;
-                            }
+                            break;
+                        }
                         }
                     }
                     catch (Exception ex)
