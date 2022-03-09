@@ -48,8 +48,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="clsActualizarEntidadesUltimoEnvio.cs" />
-    <Compile Include="clsConexiones.cs" />
+    <Compile Include="clsCargarInformacion.cs" />
+    <Compile Include="clsCentrales.cs" />
+    <Compile Include="clsConexion.cs" />
+    <Compile Include="clsConstruirInformacion.cs" />
+    <Compile Include="clsDescentralizadas.cs" />
+    <Compile Include="clsHospitales.cs" />
+    <Compile Include="clsInformacionEntidades.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
