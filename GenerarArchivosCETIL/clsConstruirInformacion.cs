@@ -23,8 +23,8 @@ namespace GenerarArchivosCETIL
 		String cantidad_registros2 = string.Empty;
 		Int64 cantidad_lineas = 0; 
 		String nitiss = "860013816";
-		String ultima_fecha_rnec = "20200505"; //Fecha del último cruce de registraduría con CETIL
-		String fechadef_depuracion = "20191025"; // Fecha por defecto para las depuraciones: Temporal
+		String ultima_fecha_rnec = "20200505";		//Fecha del último cruce de registraduría con CETIL
+		String fechadef_depuracion = "20191025";	// Fecha por defecto para las depuraciones: Temporal
 
 		public String nit = string.Empty;
 
