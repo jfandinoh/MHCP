@@ -72,7 +72,7 @@ namespace GenerarArchivosCETIL
                     "AS DATA( " +
                       "ua_co_dane character varying(5), " +
                       "ua_nro_ord character varying(5), " +
-                      "ua_nombre character varying(50), " +
+                      "ua_nombre character varying(500), " +
                       "ua_nit integer, " +
                       "ua_dig_ver smallint, " +
                       "ua_ind_tel character varying(5), " +
