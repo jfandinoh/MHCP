@@ -48,8 +48,10 @@
 
         private static string[] obliganTipo2 = { "7", "8" };
 
-        private static int[] fechasTipo1 = { 6, 9, 10, 11, 24, 27 };
-        private static int[] fechasHorasTipo1 = { 30 };
+        //private static int[] fechasTipo1 = { 6, 9, 10, 11, 24, 27 };
+        private static int[] fechasTipo1 = { 7, 10, 11, 12, 25, 28 };
+        //private static int[] fechasHorasTipo1 = { 30 };
+        private static int[] fechasHorasTipo1 = { 31 };
         private static int[] fechasTipo2 = { 8, 9, 10, 19, 39 };
         private static int[] fechasHorasTipo2 = { 25, 37 };
         private static int[] fechasTipo3 = { 5, 6 };
@@ -109,10 +111,10 @@
             NetworkShare.ConnectToShare(pathFileServer, userFileServer, passFileServer); //Conecta a FileServer SUPPT
 
             pathFileServer = Ajustes.Default.PATH_FILE_SERVER;
-            pathFileLocal = Ajustes.Default.PATH_FILE_LOCAL;
-            pathBorrador = string.Concat(pathFileLocal, Ajustes.Default.DIRECTORIO_EXTRACCION);
-            pathExito = string.Concat(pathFileLocal, Ajustes.Default.DIRECTORIO_ENVIAR_A_SUPPT);
-            pathError = string.Concat(pathFileLocal, Ajustes.Default.DIRECTORIO_ERROR);
+            pathFileLocal = Environment.CurrentDirectory;
+            pathBorrador = Path.Combine(pathFileLocal, Ajustes.Default.DIRECTORIO_EXTRACCION);
+            pathExito = Path.Combine(pathFileLocal, Ajustes.Default.DIRECTORIO_ENVIAR_A_SUPPT);
+            pathError = Path.Combine(pathFileLocal, Ajustes.Default.DIRECTORIO_ERROR);
             userFileServer = Ajustes.Default.USERNAME_FILESERVER;
             passFileServer = Ajustes.Default.PASSWORD_FILESERVER;
 
@@ -134,7 +136,8 @@
             obliga.Add("obligaTipo10", NoObligaTipo10);
 
             estructura = new Dictionary<string, int>();
-            estructura.Add("1", 32);
+            //estructura.Add("1", 32);
+            estructura.Add("1", 33);
             estructura.Add("2", 41);
             estructura.Add("3", 7);
             estructura.Add("4", 38);
@@ -172,11 +175,16 @@
             parametricas = new Dictionary<string, Dictionary<int, string[]>>();
             //Parametricas R1
             Dictionary<int, string[]> pTipo1 = new Dictionary<int, string[]>();
-            pTipo1.Add(5, new string[] { "C", "D" });
+            /*pTipo1.Add(5, new string[] { "C", "D" });
             pTipo1.Add(6, new string[] { "CEN", "HSP", "SPB", "OTR" });
             pTipo1.Add(15, new string[] { "ALC", "GOB", "GTE" });
             pTipo1.Add(27, new string[] { "ACT", "ELQ", "LIQ" });
-            pTipo1.Add(32, new string[] { "R", "A" });
+            pTipo1.Add(32, new string[] { "R", "A" });*/
+            pTipo1.Add(6, new string[] { "C", "D" });
+            pTipo1.Add(7, new string[] { "CEN", "HSP", "SPB", "OTR" });
+            pTipo1.Add(16, new string[] { "ALC", "GOB", "GTE" });
+            pTipo1.Add(28, new string[] { "ACT", "ELQ", "LIQ" });
+            pTipo1.Add(33, new string[] { "R", "A" });
             parametricas.Add("1", pTipo1);
             //Parametricas R2
             Dictionary<int, string[]> pTipo2 = new Dictionary<int, string[]>();
@@ -350,7 +358,7 @@
             List<string[]> resultado = new List<string[]>();
             try
             {
-                FileInfo file = new FileInfo(string.Concat(pathBorrador, "\\", pNombreArchivo));
+                FileInfo file = new FileInfo(Path.Combine(pathBorrador, pNombreArchivo));
                 string[] seperators = { "_;_" };
 
                 using (StreamReader sr = file.OpenText())
@@ -1047,8 +1055,8 @@
             }
             catch (Exception ex)
             {
-               // NetworkShare.DisconnectFromShare(pathFileServer, false); //Remove this line also
-                throw new Exception(ex.Message);
+                // NetworkShare.DisconnectFromShare(pathFileServer, false); //Remove this line also
+                throw new Exception(string.Format("({0}). {1}", "Error validando archivo", ex.Message));
             }
         }
 
@@ -1127,7 +1135,7 @@
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new Exception(string.Format("{0}: {1}", "GuardarAuditoriaPostgres", ex.Message));
             }   
         }
     }

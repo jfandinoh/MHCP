@@ -27,8 +27,8 @@ namespace EliminarRegistrosReptidosArchivoSUPPT
         {
             try
             {
-                string Archivo = @"D:\jfandino\Proyectos\Visual Studio\SlnJaimeAndres\Archivos\20210310100347_899999061.csv";
-                string ArchivoNuevo = @"D:\jfandino\Proyectos\Visual Studio\SlnJaimeAndres\Archivos\20210310100347_899999061_AjustadoPruebas.csv";
+                string Archivo = @"D:\jfandino\Descargas\ArchivoBogota 20220509\20220509110523_899999061.csv";
+                string ArchivoNuevo = @"D:\jfandino\Descargas\ArchivoBogota 20220509\20220509110523_899999061_AjustadoPruebas.csv";
 
                 List<string> LsRegistros = new List<string>();
 
