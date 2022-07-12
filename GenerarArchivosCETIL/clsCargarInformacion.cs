@@ -347,9 +347,11 @@ namespace GenerarArchivosCETIL
                     queryPostgrSql = "SELECT COUNT(*) FROM temp_retirados_completo;";
                     Console.WriteLine("Cantidad de registros retirados total en " + pc_datos_ultenvio + ".pc_datos_" + codigoDepto + ".tbl_f9_retirados " + "(PostgreSql - " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff") + "): " + postgreSql.ConsultarDato(queryPostgrSql));
 
+                    
                     queryPostgrSql = "DROP TABLE IF EXISTS temp_retirados;";
                     postgreSql.EjecutarQuery(queryPostgrSql);
 
+                    /*
                     queryPostgrSql = "CREATE TEMP TABLE temp_retirados AS " +
                     "SELECT t1.*FROM temp_retirados_completo t1 " +
                     "JOIN(SELECT rs_tip_doc, rs_nro_doc, MAX(f_modifica)AS fec_mod " +
@@ -358,13 +360,19 @@ namespace GenerarArchivosCETIL
                          "GROUP BY rs_tip_doc, rs_nro_doc)AS no_depurados " +
                     "ON no_depurados.rs_tip_doc = t1.rs_tip_doc AND no_depurados.rs_nro_doc = t1.rs_nro_doc AND COALESCE(no_depurados.fec_mod, NOW()) = COALESCE(t1.f_modifica, NOW()); ";
                     postgreSql.EjecutarQuery(queryPostgrSql);
+                    */
+
+                    queryPostgrSql = "CREATE TEMP TABLE temp_retirados AS " +
+                    "SELECT * FROM temp_retirados_completo where rs_eliminado IS FALSE; ";
+                    postgreSql.EjecutarQuery(queryPostgrSql);
 
                     queryPostgrSql = "SELECT COUNT(*) FROM temp_retirados;";
                     Console.WriteLine("Cantidad de registros retirados antes de la depuracion en " + pc_datos_ultenvio + ".pc_datos_" + codigoDepto + ".tbl_f9_retirados " + "(PostgreSql - " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff") + "): " + postgreSql.ConsultarDato(queryPostgrSql));
 
-                    queryPostgrSql = "CREATE UNIQUE INDEX temp_retirados_idx ON temp_retirados (rs_tip_doc,rs_nro_doc);";
+                    queryPostgrSql = "CREATE UNIQUE INDEX temp_retirados_idx ON temp_retirados (rs_tip_doc,rs_nro_doc,rs_nro_ord);";
                     postgreSql.EjecutarQuery(queryPostgrSql);
 
+                    /*
                     queryPostgrSql = "INSERT INTO temp_retirados " +
                     "SELECT t1.* " +
                     "FROM temp_retirados_completo t1 " +
@@ -378,6 +386,7 @@ namespace GenerarArchivosCETIL
 
                     queryPostgrSql = "SELECT COUNT(*) FROM temp_retirados;";
                     Console.WriteLine("Cantidad de registros retirados en " + pc_datos_ultenvio + ".pc_datos_" + codigoDepto + ".tbl_f9_retirados " + "(PostgreSql - " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff") + "): " + postgreSql.ConsultarDato(queryPostgrSql));
+                    */
                 }
                 catch (Exception ex)
                 {
@@ -467,6 +476,10 @@ namespace GenerarArchivosCETIL
                     queryPostgrSql = "DELETE FROM temp_pensionados WHERE UPPER(pe_tip_doc) NOT IN ('C','E','P','T','R','O');";
                     postgreSql.EjecutarQuery(queryPostgrSql);
 
+                    //Se quitan registros eliminados
+                    queryPostgrSql = "DELETE FROM temp_pensionados WHERE pe_eliminado IS TRUE;";
+                    postgreSql.EjecutarQuery(queryPostgrSql);
+
                     queryPostgrSql = "SELECT COUNT(*) FROM temp_pensionados;";
                     Console.WriteLine("Cantidad de registros pensionados en " + pc_datos_ultenvio + ".pc_datos_" + codigoDepto + ".tbl_f5_pensionados " + "(PostgreSql - " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff") + "): " + postgreSql.ConsultarDato(queryPostgrSql));
                 }
@@ -549,7 +562,11 @@ namespace GenerarArchivosCETIL
                     "); ";
                     postgreSql.EjecutarQuery(queryPostgrSql);
 
-                    queryPostgrSql = "DELETE FROM temp_sustitutos WHERE UPPER(be_tip_doc) NOT IN ('C','E','P','T','R','O');";
+                    queryPostgrSql = "DELETE FROM temp_sustitutos WHERE UPPER(be_tip_doc) NOT IN ('C','E','P','T','R','O') OR UPPER(be_tip_mue) NOT IN ('C','E','P','T','R','O');";
+                    postgreSql.EjecutarQuery(queryPostgrSql);
+
+                    //Se quitan registros eliminados
+                    queryPostgrSql = "DELETE FROM temp_sustitutos WHERE be_eliminado IS TRUE;";
                     postgreSql.EjecutarQuery(queryPostgrSql);
 
                     queryPostgrSql = "SELECT COUNT(*) FROM temp_sustitutos;";
@@ -642,6 +659,10 @@ namespace GenerarArchivosCETIL
                     postgreSql.EjecutarQuery(queryPostgrSql);
 
                     queryPostgrSql = "DELETE FROM temp_pensionadosfallecidos WHERE UPPER(pf_tip_mue) NOT IN ('C','E','P','T','R','O');";
+                    postgreSql.EjecutarQuery(queryPostgrSql);
+
+                    //Se quitan registros eliminados
+                    queryPostgrSql = "DELETE FROM temp_pensionadosfallecidos WHERE pf_eliminado IS TRUE;";
                     postgreSql.EjecutarQuery(queryPostgrSql);
 
                     queryPostgrSql = "SELECT COUNT(*) FROM temp_pensionadosfallecidos;";
@@ -798,7 +819,7 @@ namespace GenerarArchivosCETIL
                       "ha_nro_his smallint, " +
                       "ha_nit integer, " +
                       "ha_dig_ver smallint, " +
-                      "ha_empresa character varying(50), " +
+                      "ha_empresa character varying(250), " +
                       "ha_ciudad character varying(5), " +
                       "ha_misma_ua boolean, " +
                       "ha_sec_pub boolean, " +
@@ -864,7 +885,7 @@ namespace GenerarArchivosCETIL
                       "hs_nro_his smallint, " +
                       "hs_nit integer, " +
                       "hs_dig_ver smallint, " +
-                      "hs_empresa character varying(50), " +
+                      "hs_empresa character varying(250), " +
                       "hs_ciudad character varying(5), " +
                       "hs_misma_ua boolean, " +
                       "hs_sec_pub boolean, " +

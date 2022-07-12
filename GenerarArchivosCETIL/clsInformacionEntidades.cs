@@ -39,7 +39,7 @@ namespace GenerarArchivosCETIL
                 {
                     
                     queryMySql = "UPDATE test.EntidadesEntregadasCETIL " +
-                    "SET fecha_GeneradoCETIL = '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff") + "', nombre_Archivo ='" + nombreArchivo + "' "+
+                    "SET fecha_GeneradoCETIL = '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff") + "', nombre_Archivo ='" + nombreArchivo.Replace(@"\",@"/") + "' "+
                     "WHERE id = '" + id + "' AND cod_Et = '" + codEt + "' AND cod_Ua = '" + codUa + "'";
                     mySQL.EjecutarQuery(queryMySql);
                 }

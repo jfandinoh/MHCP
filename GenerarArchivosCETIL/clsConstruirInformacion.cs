@@ -53,7 +53,8 @@ namespace GenerarArchivosCETIL
                     queryPostgrSql = "CREATE TEMP TABLE temp_reg1 AS " +
                     "SELECT 1 AS tipo_registro, " +
                     "CASE WHEN LENGTH(hv.nitua) > 9 THEN SUBSTRING(hv.nitua,1,9) ELSE hv.nitua END AS nit_entidad, " +
-                    "TRIM(mig.nombre) AS nombre_entidad, " +
+					"CASE WHEN dian.\"RAZON_SOCIAL\" IS NOT NULL THEN concat(TRIM(mig.nombre), '-', dian.\"RAZON_SOCIAL\") ELSE TRIM(mig.nombre) END AS nombre_entidad, " +
+                    //"TRIM(mig.nombre) AS nombre_entidad, " +
                     "mig.seccional AS seccional, " +
                     "CONCAT('01', mig.seccional) AS codigoPasivocol, " +
                     "CASE WHEN mig.seccional = '000' AND LENGTH(hv.codua) = 2 AND hv.codua != '01' THEN 'D' ELSE 'C' END AS tipo_entidad, " +
@@ -85,10 +86,29 @@ namespace GenerarArchivosCETIL
                     "FROM temp_unidades_administrativas temp " +
                     "LEFT JOIN temp_ciudades ciudad ON temp.ua_co_dane = ciudad.ci_co_dane " +
                     "JOIN pruebas.tblhojavidaunidadesadministrativas hv ON temp.ua_co_dane = hv.codet AND temp.ua_nro_ord = hv.codua " +
-                    "JOIN pruebas.entidades_migracion_inter mig ON temp.ua_co_dane = mig.\"codigoDane\" AND temp.ua_nro_ord = mig.\"unidadAdministrativa\"; ";
+                    "JOIN pruebas.entidades_migracion_inter mig ON temp.ua_co_dane = mig.\"codigoDane\" AND temp.ua_nro_ord = mig.\"unidadAdministrativa\" " +
+					"LEFT OUTER JOIN public.nits_dian dian ON dian.\"NIT\" = hv.nitua; ";
                     postgreSql.EjecutarQuery(queryPostgrSql);
 
-                    queryPostgrSql = "SELECT SUBSTRING(replace(replace(replace(hv.feccreaua, ' ', ''), ':', ''), '-', ''),1,8) AS fecha_creacion, " +
+					//Se actualiza codigo seccional a 000 cuando el nit es unico
+					queryPostgrSql = "UPDATE temp_reg1 AS A "+
+					"SET seccional = '000' "+
+					"FROM(SELECT nit_entidad, SUM(Cantidad) AS cantidad FROM( "+
+					"			SELECT *, " +
+					"				ROW_NUMBER() OVER( "+ 
+					"					PARTITION BY nit_entidad "+
+					"					ORDER BY "+
+					"					nit_entidad "+
+					"				) Cantidad "+
+					"			FROM temp_reg1 "+
+					"			) tmp "+
+					"			group by(nit_entidad) "+
+					") B "+
+					"WHERE A.nit_entidad = B.nit_entidad AND B.cantidad = 1; ";
+					dataTable = postgreSql.ConsultarDatos(queryPostgrSql);
+
+					//Guarda la fecha de creacion /sgp/ iss de la entidad central para asignarle a las subdivisiones en caso de que no la tengan definida
+					queryPostgrSql = "SELECT SUBSTRING(replace(replace(replace(hv.feccreaua, ' ', ''), ':', ''), '-', ''),1,8) AS fecha_creacion, " +
                     "replace(replace(hv.feciss, ' ', ''), '-', '') AS fecha_afiliacion_iss, " +
                     "replace(replace(hv.fecsgp, ' ', ''), '-', '') AS fecha_vigencia_sgp, " +
                     "substring(replace(replace(replace(hv.fecmodreg, ' ', ''), ':', ''), '-', '') from 1 for 12) AS fecha_actualizacion, " +
@@ -134,28 +154,30 @@ namespace GenerarArchivosCETIL
                     queryPostgrSql = "DROP TABLE IF EXISTS temp_reg2; ";
                     postgreSql.EjecutarQuery(queryPostgrSql);
 
-                    queryPostgrSql = "CREATE TEMP TABLE temp_reg2 AS "+
-					"SELECT* FROM( " +
+					queryPostgrSql = "CREATE TEMP TABLE temp_reg2 AS " +
+					"SELECT * FROM( " +
+					"SELECT *, ROW_NUMBER () OVER (PARTITION BY tipo_documento,documento ORDER BY fecha_ultima_modificacion DESC) AS Cantidad " +
+					"FROM (" +
 						"SELECT 2 AS tipo_registro, ea_tip_doc AS tipo_documento, " + //ACTIVOS
 						"ea_nro_doc AS documento, " +
 						"CASE WHEN split_part(TRIM(REPLACE(ea_nombre,'  ',' ')),' ',3) <> '' " +
 							"THEN split_part(TRIM(REPLACE(ea_nombre,'  ',' ')),' ',3) " +
 							"WHEN split_part(TRIM(REPLACE(ea_nombre,'  ',' ')),' ',2) <> '' " +
 							"THEN split_part(TRIM(REPLACE(ea_nombre,'  ',' ')),' ',2) " +
-							"ELSE 'No registra' END AS primer_nombre, " +
+							"ELSE '' END AS primer_nombre, " +
 						"CASE WHEN split_part(TRIM(REPLACE(ea_nombre, '  ', ' ')), ' ', 4) <> '' " +
 							"THEN split_part(TRIM(REPLACE(ea_nombre,'  ',' ')),' ',4) " +
-							"ELSE 'No registra' END AS segundo_nombre, " +
+							"ELSE '' END AS segundo_nombre, " +
 						"CASE WHEN split_part(TRIM(REPLACE(ea_nombre, '  ', ' ')), ' ', 1) <> '' " +
 							"THEN split_part(TRIM(REPLACE(ea_nombre,'  ',' ')),' ',1) " +
-							"ELSE 'No registra' END AS primer_apellido, " +
+							"ELSE '' END AS primer_apellido, " +
 						"CASE WHEN split_part(TRIM(REPLACE(ea_nombre, '  ', ' ')), ' ', 2) <> '' " +
 							"THEN split_part(TRIM(REPLACE(ea_nombre,'  ',' ')),' ',2) " +
-							"ELSE 'No registra' END AS segundo_apellido, " +
+							"ELSE '' END AS segundo_apellido, " +
 						"CASE WHEN \"CODIGO_VIGENCIA\" LIKE '0' THEN '00' " +
 							 "WHEN \"CODIGO_VIGENCIA\" LIKE '1' THEN '01' " +
 							 "ELSE \"CODIGO_VIGENCIA\" END AS vigencia_documento, " +
-					    ultima_fecha_rnec +" AS fecha_actualizacion_rnec,  " +
+						ultima_fecha_rnec + " AS fecha_actualizacion_rnec,  " +
 						"'' AS fecha_fallecimiento_minsalud, " +
 						"CASE WHEN ea_fec_iss IS NULL THEN to_char(CAST(ea_fec_afp as date),'YYYYMMDD') " +
 							 "WHEN ea_fec_afp IS NULL THEN to_char(cast(ea_fec_iss as date),'YYYYMMDD') " +
@@ -178,7 +200,7 @@ namespace GenerarArchivosCETIL
 						"'' AS numero_contrato_ops, " +
 						"'' AS numero_resolucion_nombramiento_docente, " +
 						"'' AS anio_resolucion_nombramiento_docente, " +
-						"'' AS fecha_depuracion,  "+
+						"'' AS fecha_depuracion,  " +
 						"'NO' AS depurado_historia_laboral, " +
 						"'NO' AS depurado_pensionado, " +
 						"'NO' AS depurado_sustitutos, " +
@@ -214,20 +236,20 @@ namespace GenerarArchivosCETIL
 							"THEN split_part(TRIM(REPLACE(rs_nombre,'  ',' ')),' ',3) " +
 							"WHEN split_part(TRIM(REPLACE(rs_nombre,'  ',' ')),' ',2) <> '' " +
 							"THEN split_part(TRIM(REPLACE(rs_nombre,'  ',' ')),' ',2) " +
-							"ELSE 'No registra' END AS primer_nombre, " +
+							"ELSE '' END AS primer_nombre, " +
 						"CASE WHEN split_part(TRIM(REPLACE(rs_nombre, '  ', ' ')), ' ', 4) <> '' " +
 							"THEN split_part(TRIM(REPLACE(rs_nombre,'  ',' ')),' ',4) " +
-							"ELSE 'No registra' END AS segundo_nombre, " +
+							"ELSE '' END AS segundo_nombre, " +
 						"CASE WHEN split_part(TRIM(REPLACE(rs_nombre, '  ', ' ')), ' ', 1) <> '' " +
 							"THEN split_part(TRIM(REPLACE(rs_nombre,'  ',' ')),' ',1) " +
-							"ELSE 'No registra' END AS primer_apellido, " +
+							"ELSE '' END AS primer_apellido, " +
 						"CASE WHEN split_part(TRIM(REPLACE(rs_nombre, '  ', ' ')), ' ', 2) <> '' " +
 							"THEN split_part(TRIM(REPLACE(rs_nombre,'  ',' ')),' ',2) " +
-							"ELSE 'No registra' END AS segundo_apellido, " +
+							"ELSE '' END AS segundo_apellido, " +
 						"CASE WHEN \"CODIGO_VIGENCIA\" LIKE '0' THEN '00' " +
 							 "WHEN \"CODIGO_VIGENCIA\" LIKE '1' THEN '01' " +
 							 "ELSE \"CODIGO_VIGENCIA\" END AS vigencia_documento, " +
-						ultima_fecha_rnec +" AS fecha_actualizacion_rnec, " +
+						ultima_fecha_rnec + " AS fecha_actualizacion_rnec, " +
 						"'' AS fecha_fallecimiento_minsalud, " +
 						"CASE WHEN rs_fec_iss IS NULL THEN to_char(CAST(rs_fec_afp as date),'YYYYMMDD') " +
 							 "WHEN rs_fec_afp IS NULL THEN to_char(cast(rs_fec_iss as date),'YYYYMMDD') " +
@@ -250,7 +272,7 @@ namespace GenerarArchivosCETIL
 						"'' AS numero_contrato_ops, " +
 						"'' AS numero_resolucion_nombramiento_docente, " +
 						"'' AS anio_resolucion_nombramiento_docente, " +
-						"CASE WHEN rs_eliminado IS TRUE THEN to_char( '"+fechadef_depuracion+ "':: date ,'YYYYMMDDHH24MI') ELSE '' END AS fecha_depuracion, " + // --LA FECHA DE DEPURACIÓN SE DEBE ACTUALIZAR CUANDO ESTA INFORMACIÓN SE MONTE A LAS BD DE POSTGRES. LUIS YA SABE DE ESTE PROCESO. POR DEFECTO SE ENVÍA fechadef_depuracion "+
+						"CASE WHEN rs_eliminado IS TRUE THEN to_char( '" + fechadef_depuracion + "':: date ,'YYYYMMDDHH24MI') ELSE '' END AS fecha_depuracion, " + // --LA FECHA DE DEPURACIÓN SE DEBE ACTUALIZAR CUANDO ESTA INFORMACIÓN SE MONTE A LAS BD DE POSTGRES. LUIS YA SABE DE ESTE PROCESO. POR DEFECTO SE ENVÍA fechadef_depuracion "+
 						"CASE WHEN rs_eliminado IS TRUE THEN 'SI' ELSE 'NO' END AS depurado_historia_laboral, " +
 						"'NO' AS depurado_pensionado, " +
 						"'NO' AS depurado_sustitutos, " +
@@ -266,8 +288,8 @@ namespace GenerarArchivosCETIL
 							 "THEN to_char(f_modifica,'YYYYMMDDHH24MI') " +
 							 "ELSE to_char(now(),'YYYYMMDDHH24MI') END AS fecha_ultima_modificacion, " +
 						"CASE WHEN temp_salariobase.\"SALARIOBASEBONO\" IS NULL THEN rs_sal_92 ELSE temp_salariobase.\"SALARIOBASEBONO\" END AS salario_base_bono_pensional, " +
-						"CASE WHEN temp_salariobase.\"FECHA_SALARIOBASEBONO\" IS NULL THEN "+
-							  "CASE WHEN rs_fec_sal_92 IS NOT NULL THEN to_char(cast(rs_fec_sal_92 as date), 'YYYYMMDD') ELSE '' END "+
+						"CASE WHEN temp_salariobase.\"FECHA_SALARIOBASEBONO\" IS NULL THEN " +
+							  "CASE WHEN rs_fec_sal_92 IS NOT NULL THEN to_char(cast(rs_fec_sal_92 as date), 'YYYYMMDD') ELSE '' END " +
 							  "ELSE to_char(cast(temp_salariobase.\"FECHA_SALARIOBASEBONO\" as date), 'YYYYMMDD') END AS fecha_salario_base_bono_pensional, " +
 						"'' AS salario_base_bono_pensional_calculado, " +
 						"'RETIRADO' AS grupoA, " +
@@ -279,27 +301,27 @@ namespace GenerarArchivosCETIL
 						"FROM temp_retirados " +
 						"LEFT JOIN temp_registraduria ON rs_tip_doc = temp_registraduria.\"TIPO_DOCUMENTO_PK2\" AND rs_nro_doc = temp_registraduria.\"NUMERO_DOCUMENTO_PK1\" " +
 						"LEFT JOIN temp_salariobase ON rs_tip_doc = temp_salariobase.\"TIPO_DOCUMENTO_PK2\" AND rs_nro_doc = temp_salariobase.\"NUMERO_DOCUMENTO_PK1\" " +
-						"UNION "+
-						"SELECT 2 AS tipo_registro, pe_tip_doc AS tipo_documento, "+ //PENSIONADOS
-						"pe_nro_doc AS documento, "+
+						"UNION " +
+						"SELECT 2 AS tipo_registro, pe_tip_doc AS tipo_documento, " + //PENSIONADOS
+						"pe_nro_doc AS documento, " +
 						"CASE WHEN split_part(TRIM(REPLACE(pe_nombre,'  ',' ')),' ',3) <> '' " +
 							"THEN split_part(TRIM(REPLACE(pe_nombre,'  ',' ')),' ',3) " +
 							"WHEN split_part(TRIM(REPLACE(pe_nombre,'  ',' ')),' ',2) <> '' " +
 							"THEN split_part(TRIM(REPLACE(pe_nombre,'  ',' ')),' ',2) " +
-							"ELSE 'No registra' END AS primer_nombre, " +
+							"ELSE '' END AS primer_nombre, " +
 						"CASE WHEN split_part(TRIM(REPLACE(pe_nombre, '  ', ' ')), ' ', 4) <> '' " +
 							"THEN split_part(TRIM(REPLACE(pe_nombre,'  ',' ')),' ',4) " +
-							"ELSE 'No registra' END AS segundo_nombre, " +
+							"ELSE '' END AS segundo_nombre, " +
 						"CASE WHEN split_part(TRIM(REPLACE(pe_nombre, '  ', ' ')), ' ', 1) <> '' " +
 							"THEN split_part(TRIM(REPLACE(pe_nombre,'  ',' ')),' ',1) " +
-							"ELSE 'No registra' END AS primer_apellido, " +
+							"ELSE '' END AS primer_apellido, " +
 						"CASE WHEN split_part(TRIM(REPLACE(pe_nombre, '  ', ' ')), ' ', 2) <> '' " +
 							"THEN split_part(TRIM(REPLACE(pe_nombre,'  ',' ')),' ',2) " +
-							"ELSE 'No registra' END AS segundo_apellido, " +
+							"ELSE '' END AS segundo_apellido, " +
 						"CASE WHEN \"CODIGO_VIGENCIA\" LIKE '0' THEN '00' " +
 							 "WHEN \"CODIGO_VIGENCIA\" LIKE '1' THEN '01' " +
 							 "ELSE \"CODIGO_VIGENCIA\" END AS vigencia_documento, " +
-						ultima_fecha_rnec +" AS fecha_actualizacion_rnec, " +
+						ultima_fecha_rnec + " AS fecha_actualizacion_rnec, " +
 						"'' AS fecha_fallecimiento_minsalud, " +
 						"'' AS fecha_primera_afiliacion_sgp, " +
 						"CASE WHEN pe_fec_iss IS NOT NULL THEN 'COLP' ELSE 'OTRO' END AS codigo_regimen_primera_afiliacion, " +
@@ -334,7 +356,7 @@ namespace GenerarArchivosCETIL
 						"null AS salario_base_bono_pensional, " +
 						"null AS fecha_salario_base_bono_pensional, " +
 						"'' AS salario_base_bono_pensional_calculado, " +
-						"'PENSIONADO' AS grupoA, "+
+						"'PENSIONADO' AS grupoA, " +
 						"pe_co_dane AS codet, " +
 						"pe_nro_ord AS codua, " +
 						"pe_id AS regid, " +
@@ -343,26 +365,26 @@ namespace GenerarArchivosCETIL
 						"FROM temp_pensionados " +
 						"LEFT JOIN temp_registraduria ON pe_tip_doc = \"TIPO_DOCUMENTO_PK2\" AND pe_nro_doc = \"NUMERO_DOCUMENTO_PK1\" " +
 						"UNION " + //SUSTITUTOS
-						"SELECT 2 AS tipo_registro, be_tip_doc AS tipo_documento, "+
+						"SELECT 2 AS tipo_registro, be_tip_doc AS tipo_documento, " +
 						"be_nro_doc AS documento, " +
 						"CASE WHEN split_part(TRIM(REPLACE(be_nombre,'  ',' ')),' ',3) <> '' " +
 							"THEN split_part(TRIM(REPLACE(be_nombre,'  ',' ')),' ',3) " +
 							"WHEN split_part(TRIM(REPLACE(be_nombre,'  ',' ')),' ',2) <> '' " +
 							"THEN split_part(TRIM(REPLACE(be_nombre,'  ',' ')),' ',2) " +
-							"ELSE 'No registra' END AS primer_nombre, " +
+							"ELSE '' END AS primer_nombre, " +
 						"CASE WHEN split_part(TRIM(REPLACE(be_nombre, '  ', ' ')), ' ', 4) <> '' " +
 							"THEN split_part(TRIM(REPLACE(be_nombre,'  ',' ')),' ',4) " +
-							"ELSE 'No registra' END AS segundo_nombre, " +
+							"ELSE '' END AS segundo_nombre, " +
 						"CASE WHEN split_part(TRIM(REPLACE(be_nombre, '  ', ' ')), ' ', 1) <> '' " +
 							"THEN split_part(TRIM(REPLACE(be_nombre,'  ',' ')),' ',1) " +
-							"ELSE 'No registra' END AS primer_apellido, " +
+							"ELSE '' END AS primer_apellido, " +
 						"CASE WHEN split_part(TRIM(REPLACE(be_nombre, '  ', ' ')), ' ', 2) <> '' " +
 							"THEN split_part(TRIM(REPLACE(be_nombre,'  ',' ')),' ',2) " +
-							"ELSE 'No registra' END AS segundo_apellido, " +
+							"ELSE '' END AS segundo_apellido, " +
 						"CASE WHEN \"CODIGO_VIGENCIA\" LIKE '0' THEN '00' " +
 							 "WHEN \"CODIGO_VIGENCIA\" LIKE '1' THEN '01' " +
 							 "ELSE \"CODIGO_VIGENCIA\" END AS vigencia_documento, " +
-						ultima_fecha_rnec +" AS fecha_actualizacion_rnec, " +
+						ultima_fecha_rnec + " AS fecha_actualizacion_rnec, " +
 						"'' AS fecha_fallecimiento_minsalud, " +
 						"null AS fecha_primera_afiliacion_sgp, " +
 						"'OTRO' AS codigo_regimen_primera_afiliacion, " +
@@ -405,27 +427,27 @@ namespace GenerarArchivosCETIL
 						"to_char(be_fec_nac, 'YYYYMMDD') AS fecha_nacimiento " +
 						"FROM temp_sustitutos " +
 						"LEFT JOIN temp_registraduria ON be_tip_doc = \"TIPO_DOCUMENTO_PK2\" AND be_nro_doc = \"NUMERO_DOCUMENTO_PK1\" " +
-						"UNION "+
-						"SELECT 2 AS tipo_registro, pf_tip_mue AS tipo_documento, "+ //PENSIONADOS FALLECIDOS
+						"UNION " +
+						"SELECT 2 AS tipo_registro, pf_tip_mue AS tipo_documento, " + //PENSIONADOS FALLECIDOS
 						"pf_doc_mue AS documento, " +
 						"CASE WHEN split_part(TRIM(REPLACE(pf_nom_mue,'  ',' ')),' ',3) <> '' " +
 							"THEN split_part(TRIM(REPLACE(pf_nom_mue,'  ',' ')),' ',3) " +
 							"WHEN split_part(TRIM(REPLACE(pf_nom_mue,'  ',' ')),' ',2) <> '' " +
 							"THEN split_part(TRIM(REPLACE(pf_nom_mue,'  ',' ')),' ',2) " +
-							"ELSE 'No registra' END AS primer_nombre, " +
+							"ELSE '' END AS primer_nombre, " +
 						"CASE WHEN split_part(TRIM(REPLACE(pf_nom_mue, '  ', ' ')), ' ', 4) <> '' " +
 							"THEN split_part(TRIM(REPLACE(pf_nom_mue,'  ',' ')),' ',4) " +
-							"ELSE 'No registra' END AS segundo_nombre, " +
+							"ELSE '' END AS segundo_nombre, " +
 						"CASE WHEN split_part(TRIM(REPLACE(pf_nom_mue, '  ', ' ')), ' ', 1) <> '' " +
 							"THEN split_part(TRIM(REPLACE(pf_nom_mue,'  ',' ')),' ',1) " +
-							"ELSE 'No registra' END AS primer_apellido, " +
+							"ELSE '' END AS primer_apellido, " +
 						"CASE WHEN split_part(TRIM(REPLACE(pf_nom_mue, '  ', ' ')), ' ', 2) <> '' " +
 							"THEN split_part(TRIM(REPLACE(pf_nom_mue,'  ',' ')),' ',2) " +
-							"ELSE 'No registra' END AS segundo_apellido, " +
+							"ELSE '' END AS segundo_apellido, " +
 						"CASE WHEN \"CODIGO_VIGENCIA\" LIKE '0' THEN '00' " +
 							 "WHEN \"CODIGO_VIGENCIA\" LIKE '1' THEN '01' " +
 							 "ELSE \"CODIGO_VIGENCIA\" END AS vigencia_documento, " +
-						ultima_fecha_rnec +" AS fecha_actualizacion_rnec, " +
+						ultima_fecha_rnec + " AS fecha_actualizacion_rnec, " +
 						"'' AS fecha_fallecimiento_minsalud, " +
 						"'' AS fecha_primera_afiliacion_sgp, " +
 						"CASE WHEN pf_fec_iss IS NOT NULL THEN 'COLP' ELSE 'OTRO' END AS codigo_regimen_primera_afiliacion, " +
@@ -435,7 +457,7 @@ namespace GenerarArchivosCETIL
 						 "CASE WHEN pf_ano_res_fallecimiento IS NULL THEN '' " +
 							 "WHEN pf_ano_res_fallecimiento BETWEEN 10 AND 99 THEN TO_CHAR(1900 + pf_ano_res_fallecimiento,'9999') " +
 							 "WHEN pf_ano_res_fallecimiento BETWEEN 10000000 AND 99999999 THEN SUBSTRING(TO_CHAR(pf_ano_res_fallecimiento, '99999999'),6,8) " +
-							 "WHEN pf_ano_res_fallecimiento BETWEEN 1900 AND "+ anio_corte +" THEN TO_CHAR(pf_ano_res_fallecimiento,'9999') " +
+							 "WHEN pf_ano_res_fallecimiento BETWEEN 1900 AND " + anio_corte + " THEN TO_CHAR(pf_ano_res_fallecimiento,'9999') " +
 							 "ELSE '' END AS anio_resolucion_fallecimiento, " +
 						"'' AS documento_homonimo, " +
 						"'' AS descripcion_depuracion, " +
@@ -445,7 +467,7 @@ namespace GenerarArchivosCETIL
 						"'' AS anio_acto_admin_pago_bono, " +
 						"'' AS numero_contrato_ops, " +
 						"'' AS numero_resolucion_nombramiento_docente, " +
-						"'' AS anio_resolucion_nombramiento_docente, "+
+						"'' AS anio_resolucion_nombramiento_docente, " +
 					   "CASE WHEN pf_eliminado IS TRUE THEN to_char( '" + fechadef_depuracion + "':: date ,'YYYYMMDDHH24MI') ELSE '' END AS fecha_depuracion, " +
 						"'NO' AS depurado_historia_laboral, " +
 						"CASE WHEN pf_eliminado IS TRUE THEN 'SI' ELSE 'NO' END AS depurado_pensionado, " +
@@ -472,7 +494,8 @@ namespace GenerarArchivosCETIL
 						"to_char(pf_fec_nac, 'YYYYMMDD') AS fecha_nacimiento " +
 						"FROM temp_pensionadosfallecidos " +
 						"LEFT JOIN temp_registraduria ON pf_tip_mue = \"TIPO_DOCUMENTO_PK2\" AND pf_doc_mue = \"NUMERO_DOCUMENTO_PK1\" " +
-						")AS info_personas; " ;
+						")AS info_personas " +
+					") tmp WHERE tmp.Cantidad = 1;";
                     postgreSql.EjecutarQuery(queryPostgrSql);
 
                     queryPostgrSql = "SELECT COUNT(*) FROM temp_reg2;";
@@ -501,14 +524,14 @@ namespace GenerarArchivosCETIL
 
 				try
 				{
-					queryPostgrSql = "DROP TABLE IF EXISTS temporal; ";
+					queryPostgrSql = "DROP TABLE IF EXISTS temporal_total; ";
 					postgreSql.EjecutarQuery(queryPostgrSql);
 
-					queryPostgrSql = "CREATE TEMP TABLE temporal AS "+
+					queryPostgrSql = "CREATE TEMP TABLE temporal_total AS " +
 					"SELECT* FROM( " +
-						"select " +
+						"SELECT " +
 						"tipo_documento, documento, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, " +
-						"fec_nac, fec_ingreso, fec_retiro, empleador, entidad, mismaua, grupoa, sec_pub, otr_pub, sec_pri, fuente, " +
+						"fec_nac, fec_ingreso, fec_retiro, COALESCE(empleador,'000000000') AS empleador, entidad, mismaua, grupoa, sec_pub, otr_pub, sec_pri, fuente, " +
 						"ROW_NUMBER() OVER( " +
 							"PARTITION BY tipo_documento, documento, empleador, entidad, mismaua " +
 							"ORDER BY documento " +
@@ -611,7 +634,14 @@ namespace GenerarArchivosCETIL
 					") TMP2; ";
 					postgreSql.EjecutarQuery(queryPostgrSql);
 
-					queryPostgrSql = "CREATE INDEX idx_doc_nit ON temporal (tipo_documento,documento,empleador);";
+					queryPostgrSql = "CREATE INDEX idx_doc_nit ON temporal_total (tipo_documento,documento,empleador);";
+					postgreSql.EjecutarQuery(queryPostgrSql);
+
+					queryPostgrSql = "DROP TABLE IF EXISTS temporal;";
+					postgreSql.EjecutarQuery(queryPostgrSql);
+
+					queryPostgrSql = "CREATE TEMP TABLE temporal AS "+
+					"SELECT * FROM temporal_total WHERE mismaua = 'true'; ";
 					postgreSql.EjecutarQuery(queryPostgrSql);
 
 					queryPostgrSql = "SELECT COUNT(*) FROM temporal;";
@@ -774,7 +804,7 @@ namespace GenerarArchivosCETIL
 							 "WHEN f3.ea_fec_iss IS NOT NULL AND f3.ea_fec_afp IS NULL AND f3.ea_fec_otr IS NULL THEN 'ISS' " +
 							 "WHEN f3.ea_fec_afp IS NOT NULL AND f3.ea_fec_iss IS NULL AND f3.ea_fec_otr IS NULL THEN 'AFP' " +
 							 "WHEN f3.ea_fec_otr IS NOT NULL AND f3.ea_fec_iss IS NULL AND f3.ea_fec_afp IS NULL THEN 'Otro' " +
-							 "ELSE 'No Registra' END AS nombre_fondo_aportes, " +
+							 "ELSE '' END AS nombre_fondo_aportes, " +
 						"8 AS horas_laboradas, " +
 						"0 AS dias_interrupcion, " +
 						"'' AS fuente_recursos, " +
@@ -804,7 +834,7 @@ namespace GenerarArchivosCETIL
 							 "ELSE 'N' END AS realizo_aportes, " +
 						"CASE WHEN fondos.nit IS NOT NULL THEN fondos.nit " +
 							 "WHEN fondos.id IS NOT NULL THEN fondos.id ELSE '0' END AS nit_fondo_aportes, " +
-						"CASE WHEN fondos.id IS NOT NULL THEN fondos.nombre ELSE 'No Registra' END AS nombre_fondo_aportes, " +
+						"CASE WHEN fondos.id IS NOT NULL THEN fondos.nombre ELSE '' END AS nombre_fondo_aportes, " +
 						"8 AS horas_laboradas, " +
 						"0 AS dias_interrupcion, " +
 						"'' AS fuente_recursos, " +
@@ -841,7 +871,7 @@ namespace GenerarArchivosCETIL
 						"CASE WHEN(f9.rs_fec_iss IS NOT NULL AND TO_CHAR(CAST(f9.rs_fec_iss AS DATE),'YYYYMMDD') < CASE WHEN f1.fecha_vigencia_sgp IS NULL THEN '20210101' ELSE f1.fecha_vigencia_sgp END) THEN 'ISS' " +
 							 "WHEN(f9.rs_fec_afp IS NOT NULL AND TO_CHAR(CAST(f9.rs_fec_afp AS DATE), 'YYYYMMDD') < CASE WHEN f1.fecha_vigencia_sgp IS NULL THEN '20210101' ELSE f1.fecha_vigencia_sgp END) THEN 'AFP' " +
 							 "WHEN(f9.rs_fec_otr IS NOT NULL AND TO_CHAR(CAST(f9.rs_fec_otr AS DATE), 'YYYYMMDD') < CASE WHEN f1.fecha_vigencia_sgp IS NULL THEN '20210101' ELSE f1.fecha_vigencia_sgp END) THEN 'Otro' " +
-							 "ELSE 'No Registra' END AS nombre_fondo_aportes, " +
+							 "ELSE '' END AS nombre_fondo_aportes, " +
 						"8 AS horas_laboradas, " +
 						"0 AS dias_interrupcion, " +
 						"'' AS fuente_recursos, " +
@@ -871,7 +901,7 @@ namespace GenerarArchivosCETIL
 							"ELSE 'N' END AS realizo_aportes, " +
 						"CASE WHEN fondos.nit IS NOT NULL THEN fondos.nit " +
 							 "WHEN fondos.id IS NOT NULL THEN fondos.id ELSE '0' END AS nit_fondo_aportes, " +
-						"CASE WHEN fondos.id IS NOT NULL THEN fondos.nombre ELSE 'No Registra' END AS nombre_fondo_aportes, " +
+						"CASE WHEN fondos.id IS NOT NULL THEN fondos.nombre ELSE '' END AS nombre_fondo_aportes, " +
 						"8 AS horas_laboradas, " +
 						"0 AS dias_interrupcion, " +
 						"'' AS fuente_recursos, " +
@@ -934,7 +964,7 @@ namespace GenerarArchivosCETIL
  						"(EXTRACT(YEAR FROM f3.f_corte) || '0101') AS fecha_inicial_causacion, " +
 						"(EXTRACT(YEAR FROM f3.f_corte) || '1231') AS fecha_final_causacion " +
 						"FROM temp_activos AS f3 " +
-						"LEFT JOIN temp_reg4 AS r4 ON r4.tipo_documento_beneficiario = f3.ea_tip_doc AND r4.documento_beneficiario = f3.ea_nro_doc " +
+						"INNER JOIN temp_reg4 AS r4 ON r4.tipo_documento_beneficiario = f3.ea_tip_doc AND r4.documento_beneficiario = f3.ea_nro_doc " +
 						"UNION " +
 						"SELECT 6 AS tipo_registro, " +
 						"r4.numero_certificacion, " +
@@ -948,7 +978,7 @@ namespace GenerarArchivosCETIL
  						"(EXTRACT(YEAR FROM rs_fec_ret) || '0101') AS fecha_inicial_causacion, " +
 						 "(EXTRACT(YEAR FROM rs_fec_ret) || '1231') AS fecha_final_causacion " +
 						"FROM temp_retirados AS f9 " +
-						"LEFT JOIN temp_reg4 AS r4 ON r4.tipo_documento_beneficiario = f9.rs_tip_doc AND r4.documento_beneficiario = f9.rs_nro_doc " +
+						"INNER JOIN temp_reg4 AS r4 ON r4.tipo_documento_beneficiario = f9.rs_tip_doc AND r4.documento_beneficiario = f9.rs_nro_doc " +
 					") AS salarios; ";
 					postgreSql.EjecutarQuery(queryPostgrSql);
 
