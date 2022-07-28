@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenerarArchivosSUPPT_Cursos
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MHCP.DGT.SUPPT.ValidaArchivoCetil.Program", "ValidaArchivoCetil\MHCP.DGT.SUPPT.ValidaArchivoCetil.Program.csproj", "{CE0CDAEB-4C37-4E06-B117-E6A8B8F3F2BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Encriptador", "Encriptador\Encriptador.csproj", "{A0E61521-9D1D-484A-AE15-68C6BFD6917C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,10 @@ Global
 		{CE0CDAEB-4C37-4E06-B117-E6A8B8F3F2BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE0CDAEB-4C37-4E06-B117-E6A8B8F3F2BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE0CDAEB-4C37-4E06-B117-E6A8B8F3F2BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0E61521-9D1D-484A-AE15-68C6BFD6917C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0E61521-9D1D-484A-AE15-68C6BFD6917C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0E61521-9D1D-484A-AE15-68C6BFD6917C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0E61521-9D1D-484A-AE15-68C6BFD6917C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
