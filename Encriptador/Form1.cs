@@ -31,6 +31,19 @@ namespace Encriptador
             cmbProceso.SelectedIndex = 0;
 
             txtLlave.Text = string.Format("{0}-{1}", "656a89da-5a56-4a11-9478-c8987fa0d516", DateTime.Now.Date.ToString("yyyy-MM-dd"));
+
+
+            double juliano = 44769.6134419792;
+            DateTime dateTime = DateTime.FromOADate(juliano);
+
+
+            DateTime hoy = DateTime.Now;
+            double Julianohoy = hoy.ToOADate();
+            decimal Julianohoydec = Convert.ToDecimal( hoy.ToOADate());
+            string JualianohoyStr = Julianohoy.ToString("R");
+
+            Console.WriteLine(dateTime.ToString("yyyy-MM-dd HH:mm:ss fff"));
+
         }
 
         private void btnProcesar_Click(object sender, EventArgs e)
